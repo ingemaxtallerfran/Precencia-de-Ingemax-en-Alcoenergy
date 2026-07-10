@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f0f0f0">
+<title>INGEMAX — Presencia en obra · Coronel Oviedo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --naranja:#D9540A;
+    --naranja-dim:rgba(217,84,10,0.10);
+    --naranja-dim2:rgba(217,84,10,0.06);
+    --papel:#f0f0f0;
+    --gris1:#ffffff;
+    --gris2:#eceae5;
+    --gris3:#d8d5cd;
+    --gris4:#b0aca0;
+    --gris5:#767267;
+    --borde:#dcd8cf;
+    --texto:#161513;
+    --texto2:#55524a;
+    --verde:#16a34a;
+    --rojo:#c0392b;
+    --radius:10px;
+    --rsm:7px;
+    --sans:'Barlow',system-ui,sans-serif;
+    --cond:'Barlow Condensed',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:var(--papel);color:var(--texto);}
+  body{font-family:var(--sans);}
+  .root{max-width:1200px;margin:0 auto;padding:0 18px 60px;}
+
+  /* ── BRANDBAR ── */
+  .brandbar{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:2px solid var(--naranja);margin-bottom:22px;flex-wrap:wrap;gap:10px;}
+  .brand-left{display:flex;align-items:center;gap:12px;}
+  .logo-box{background:#111;border-radius:var(--rsm);padding:6px 12px;display:flex;align-items:center;height:38px;}
+  .logo-text{font-family:var(--cond);font-size:20px;font-weight:800;letter-spacing:.04em;color:#fff;}
+  .logo-text span{color:var(--naranja);}
+  .brand-tag{font-family:var(--cond);font-size:10px;color:var(--gris5);letter-spacing:.14em;text-transform:uppercase;border-left:2px solid var(--borde);padding-left:10px;line-height:1.5;}
+  .edit-badge{font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--naranja);color:#fff;padding:4px 10px;border-radius:20px;}
+
+  /* ── HEADER ── */
+  header{margin-bottom:24px;}
+  .eyebrow{font-family:var(--cond);font-size:10px;letter-spacing:.18em;color:var(--naranja);text-transform:uppercase;font-weight:700;margin-bottom:4px;}
+  h1{font-family:var(--cond);font-weight:800;font-size:30px;letter-spacing:.01em;margin-bottom:4px;}
+  .subt{font-family:var(--sans);font-size:13px;color:var(--texto2);}
+
+  section{margin-bottom:30px;}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+  .sec-head h2{font-family:var(--cond);font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;}
+  .sec-head .hint{font-family:var(--cond);font-size:11px;color:var(--gris5);letter-spacing:.03em;}
+
+  /* ── EDITABLE NAMES ── */
+  .editable-name{cursor:default;}
+  body.edit-mode .editable-name{cursor:text;text-decoration:underline dotted;text-underline-offset:3px;text-decoration-color:var(--gris4);}
+  body.edit-mode .editable-name:hover{color:var(--naranja);text-decoration-color:var(--naranja);}
+  .edit-input{font:inherit;background:var(--gris2);border:1px solid var(--naranja);border-radius:3px;padding:1px 4px;color:var(--texto);outline:none;width:100%;}
+
+  /* ── CALENDARIO / GANTT ── */
+  .gantt-wrap{background:var(--gris1);border:1px solid var(--borde);border-radius:var(--radius);overflow-x:auto;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+  .gantt{min-width:880px;}
+  .gantt-ruler{display:flex;border-bottom:1px solid var(--borde);position:sticky;top:0;background:var(--gris2);z-index:2;}
+  .gantt-ruler .rl{min-width:170px;flex:0 0 170px;padding:9px 12px;border-right:1px solid var(--borde);font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gris5);display:flex;align-items:center;}
+  .gantt-ruler .month{font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gris5);padding:9px 0 9px 6px;border-left:1px solid var(--borde);}
+  .gantt-row{display:flex;border-bottom:1px solid var(--borde);}
+  .gantt-row:last-child{border-bottom:none;}
+  .gantt-row:hover{background:rgba(217,84,10,.03);}
+  .gantt-row .rl{min-width:170px;flex:0 0 170px;padding:10px 12px;border-right:1px solid var(--borde);display:flex;flex-direction:column;justify-content:center;gap:1px;}
+  .rl .name{font-family:var(--cond);font-weight:700;font-size:14px;}
+  .rl .days{font-family:var(--cond);font-size:11px;color:var(--naranja);font-weight:700;letter-spacing:.02em;}
+  .gantt-track{position:relative;flex:1;min-height:46px;}
+  .gantt-bar{position:absolute;top:8px;height:30px;border-radius:5px;display:flex;align-items:center;padding:0 9px;overflow:hidden;white-space:nowrap;font-family:var(--cond);font-size:12px;font-weight:700;color:#fff;letter-spacing:.02em;box-shadow:0 1px 2px rgba(0,0,0,.15);}
+  .gantt-bar small{font-weight:500;margin-left:6px;opacity:.85;font-size:10.5px;}
+
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-family:var(--cond);font-size:11.5px;color:var(--texto2);}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:11px;height:11px;display:inline-block;border-radius:3px;}
+
+  /* ── STATS (discretas, sin plata) ── */
+  .stats{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--borde);border-radius:var(--radius);background:var(--gris1);overflow:hidden;}
+  .stat{flex:1;min-width:150px;padding:12px 18px;border-left:1px solid var(--borde);}
+  .stat:first-child{border-left:none;}
+  .stat .n{font-family:var(--cond);font-size:20px;font-weight:800;color:var(--texto);}
+  .stat .l{font-family:var(--cond);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris5);font-weight:700;margin-top:1px;}
+
+  /* ── COSTOS ── */
+  .costos-total-line{font-family:var(--cond);font-size:12px;color:var(--texto2);margin-bottom:14px;padding:8px 12px;background:var(--gris2);border-radius:var(--rsm);}
+  .costos-total-line b{color:var(--texto);font-weight:800;}
+  .trip-card{background:var(--gris1);border:1px solid var(--borde);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;}
+  .trip-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:11px 15px;border-bottom:1px solid var(--borde);background:var(--gris2);}
+  .trip-head .tname{font-family:var(--cond);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:.02em;}
+  .trip-head .tdates{font-family:var(--cond);font-size:11.5px;color:var(--naranja);font-weight:700;letter-spacing:.02em;}
+  .trip-head .ttotal{font-family:var(--cond);font-size:13px;font-weight:700;color:var(--texto2);}
+  .trip-body{padding:11px 15px;}
+  .trip-people{font-family:var(--cond);font-size:11.5px;color:var(--gris5);margin-bottom:9px;letter-spacing:.02em;}
+  table.costs{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:12.5px;}
+  table.costs th{text-align:left;font-family:var(--cond);text-transform:uppercase;font-size:10px;letter-spacing:.06em;color:var(--gris5);font-weight:700;padding:6px 8px;border-bottom:1px solid var(--borde);}
+  table.costs td{padding:6px 8px;border-bottom:1px solid var(--gris2);}
+  table.costs input{background:transparent;border:none;border-bottom:1px dashed var(--gris4);color:var(--texto);font-family:var(--sans);font-size:12.5px;width:100%;padding:2px 0;}
+  table.costs input:focus{outline:none;border-bottom:1px solid var(--naranja);}
+  td.num{text-align:right;font-family:var(--sans);}
+  .pend{color:var(--rojo);}
+  .estado-btn{font-family:var(--cond);font-size:10.5px;font-weight:700;letter-spacing:.02em;border:1px solid var(--borde);border-radius:20px;padding:4px 10px;cursor:pointer;background:transparent;white-space:nowrap;}
+  .estado-btn.estado-pend{color:var(--rojo);border-color:var(--rojo);}
+  .estado-btn.estado-ok{color:#fff;background:var(--verde);border-color:var(--verde);}
+
+  .note{font-family:var(--cond);font-size:11.5px;color:var(--gris5);background:var(--gris2);border-left:3px solid var(--naranja);padding:8px 12px;letter-spacing:.02em;}
+
+  footer{padding:20px 0;color:var(--gris5);font-family:var(--cond);font-size:11px;border-top:1px solid var(--borde);margin-top:14px;letter-spacing:.03em;}
+
+  @media (max-width:768px){
+    .gantt-ruler .rl,.gantt-row .rl{min-width:130px;flex:0 0 130px;}
+    h1{font-size:22px;}
+    .stat{min-width:120px;}
+  }
+</style>
+</head>
+<body>
+<div class="root">
+
+  <div class="brandbar">
+    <div class="brand-left">
+      <div class="logo-box"><div class="logo-text">INGE<span>MAX</span></div></div>
+      <div class="brand-tag">AlcoEnergy · Coronel Oviedo, PY</div>
+    </div>
+    <div id="editBadgeWrap"></div>
+  </div>
+
+  <header>
+    <div class="eyebrow">Seguimiento de obra</div>
+    <h1>Presencia del equipo en Paraguay</h1>
+    <p class="subt">Calendario de estadías y costos asociados a cada viaje.</p>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <h2>Calendario de presencia</h2>
+      <span class="hint">Cada barra es la estadía de una persona. Pasá el mouse para ver el detalle.</span>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="gantt-wrap"><div class="gantt" id="gantt"></div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>En números</h2></div>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Costos por viaje</h2>
+      <span class="hint">Tocá un monto para corregirlo. Tocá el estado para marcar pagado.</span>
+    </div>
+    <div class="costos-total-line" id="costosTotalLine"></div>
+    <div id="trips"></div>
+    <div class="note">Rojo = monto pendiente de confirmar. El estado de pago y las ediciones no quedan guardados al recargar — son para uso en el momento.</div>
+  </section>
+
+  <footer>INGEMAX S.A. · Herramienta interna de seguimiento de viajes a obra</footer>
+</div>
+
+<script>
+const EDIT_MODE = new URLSearchParams(location.search).get('edit') === '1';
+if(EDIT_MODE) document.body.classList.add('edit-mode');
+const RATE = 1400; // ARS por USD, aproximado
+
+// ⚠️ Pegá acá la URL de tu implementación de Apps Script (termina en /exec)
+const GAS_URL = 'https://script.google.com/macros/s/AKfycby4TmKAYjTAjvUPGJYvRMVCq7WrDWMPnxwnFLkeVuYpsxIYHQjHLG9Wji9_CYx-9Q8w/exec';
+
+let PEOPLE = {};
+let TRIPS = [];
+let STAYS = [];
+
+// ---------- JSONP helper (mismo patrón que tus otras apps) ----------
+let _jsonpCounter = 0;
+function jsonp(params){
+  return new Promise((resolve, reject)=>{
+    const cbName = '_cb' + (_jsonpCounter++);
+    params.callback = cbName;
+    const qs = Object.entries(params).map(([k,v])=> encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
+    const script = document.createElement('script');
+    window[cbName] = (data)=>{
+      resolve(data);
+      delete window[cbName];
+      script.remove();
+    };
+    script.onerror = ()=>{ reject(new Error('Error de red contra el backend')); delete window[cbName]; script.remove(); };
+    script.src = GAS_URL + '?' + qs;
+    document.body.appendChild(script);
+  });
+}
+
+async function loadData(){
+  const wrap = document.getElementById('gantt');
+  wrap.innerHTML = '<div style="padding:20px;font-family:var(--cond);color:var(--gris5);">Cargando datos desde la planilla…</div>';
+  try{
+    const data = await jsonp({ action:'getAll' });
+    if(!data.ok) throw new Error(data.error || 'Error desconocido');
+    PEOPLE = data.people;
+    TRIPS = data.trips;
+    STAYS = data.stays;
+    renderAll();
+  }catch(err){
+    wrap.innerHTML = '<div style="padding:20px;font-family:var(--cond);color:var(--rojo);">No se pudo conectar con la planilla. Revisá que GAS_URL esté bien pegada y que el deploy sea "Cualquiera" con acceso. Detalle: '+err.message+'</div>';
+  }
+}
+
+// ---------- helpers ----------
+function toUSD(amount, cur){ return cur==='ARS' ? amount/RATE : amount; }
+function fmtUSD(n){ return 'USD ' + n.toLocaleString('es-AR',{maximumFractionDigits:0}); }
+function dayDiff(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); }
+function fmtDate(d){ const dt=new Date(d+'T00:00:00'); return dt.toLocaleDateString('es-AR',{day:'2-digit',month:'short'}); }
+function tripById(id){ return TRIPS.find(t=>t.id===id); }
+
+// ---------- edición por doble click ----------
+function getByPath(path){
+  const parts = path.split('.');
+  let obj = parts[0]==='people' ? PEOPLE : TRIPS;
+  for(let i=1;i<parts.length-1;i++){ obj = obj[parts[i]]; }
+  return obj[parts[parts.length-1]];
+}
+function setByPath(path, value){
+  const parts = path.split('.');
+  let obj = parts[0]==='people' ? PEOPLE : TRIPS;
+  for(let i=1;i<parts.length-1;i++){ obj = obj[parts[i]]; }
+  obj[parts[parts.length-1]] = value;
+}
+function editableName(text, path, cls){
+  if(!EDIT_MODE) return `<span class="${cls||''}">${text}</span>`;
+  return `<span class="editable-name ${cls||''}" data-path="${path}" ondblclick="startEdit(this)">${text}</span>`;
+}
+function startEdit(el){
+  const path = el.dataset.path;
+  const current = getByPath(path);
+  const input = document.createElement('input');
+  input.className = 'edit-input';
+  input.value = current;
+  el.replaceWith(input);
+  input.focus();
+  input.select();
+  function commit(){
+    const val = input.value.trim() || current;
+    setByPath(path, val);
+    renderAll();
+    saveEdit(path, val);
+  }
+  input.addEventListener('blur', commit);
+  input.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); input.blur(); }
+    if(e.key==='Escape'){ input.value=current; input.blur(); }
+  });
+}
+
+async function saveEdit(path, value){
+  const parts = path.split('.');
+  try{
+    if(parts[0]==='people'){
+      await jsonp({ action:'renamePersona', id:parts[1], nombre:value });
+    } else if(parts[0]==='trips' && parts.length===3 && parts[2]==='name'){
+      const trip = TRIPS[+parts[1]];
+      await jsonp({ action:'renameTrip', tripId:trip.id, nombre:value });
+    } else if(parts[0]==='trips' && parts[2]==='items'){
+      const trip = TRIPS[+parts[1]];
+      await jsonp({ action:'renameItem', tripId:trip.id, itemIndex:parts[3], concepto:value });
+    }
+  }catch(err){
+    alert('No se pudo guardar el cambio en la planilla: ' + err.message);
+  }
+}
+
+// ---------- GANTT ----------
+function renderGantt(){
+  const wrap = document.getElementById('gantt');
+  const legend = document.getElementById('legend');
+  legend.innerHTML = Object.entries(PEOPLE).map(([id,p])=>`<span><i style="background:${p.color}"></i>${p.name}</span>`).join('');
+
+  const allDates = STAYS.flatMap(s=>[s.from,s.to]);
+  const minDate = new Date(Math.min(...allDates.map(d=>new Date(d))));
+  const maxDate = new Date(Math.max(...allDates.map(d=>new Date(d))));
+  minDate.setDate(minDate.getDate()-3);
+  maxDate.setDate(maxDate.getDate()+3);
+  const totalDays = dayDiff(minDate.toISOString().slice(0,10), maxDate.toISOString().slice(0,10));
+  const pxPerDay = 14;
+  const trackWidth = totalDays*pxPerDay;
+
+  let months = [];
+  let cur = new Date(minDate);
+  while(cur <= maxDate){
+    const label = cur.toLocaleDateString('es-AR',{month:'short',year:'2-digit'});
+    const firstOfMonth = new Date(cur.getFullYear(), cur.getMonth(), 1);
+    const start = firstOfMonth < minDate ? minDate : firstOfMonth;
+    const nextMonth = new Date(cur.getFullYear(), cur.getMonth()+1, 1);
+    const end = nextMonth > maxDate ? maxDate : nextMonth;
+    const width = dayDiff(start.toISOString().slice(0,10), end.toISOString().slice(0,10)) * pxPerDay;
+    months.push({label, width});
+    cur = nextMonth;
+  }
+
+  let html = `<div class="gantt-ruler"><div class="rl">Equipo</div><div style="position:relative;flex:1;width:${trackWidth}px;display:flex;">`;
+  months.forEach(m=>{ html += `<div class="month" style="width:${m.width}px;">${m.label}</div>`; });
+  html += `</div></div>`;
+
+  Object.entries(PEOPLE).forEach(([id,p])=>{
+    const stays = STAYS.filter(s=>s.person===id);
+    if(stays.length===0) return;
+    const totalP = stays.reduce((s,st)=> s+dayDiff(st.from,st.to), 0);
+    html += `<div class="gantt-row"><div class="rl"><div class="name">${editableName(p.name,'people.'+id+'.name')}</div><div class="days">${totalP} días en obra</div></div>`;
+    html += `<div class="gantt-track" style="width:${trackWidth}px;">`;
+    stays.forEach(s=>{
+      const trip = tripById(s.tripId);
+      const label = trip.name + (s.suffix ? ' '+s.suffix : '');
+      const offset = dayDiff(minDate.toISOString().slice(0,10), s.from) * pxPerDay;
+      const width = Math.max(dayDiff(s.from,s.to) * pxPerDay, 20);
+      html += `<div class="gantt-bar" style="left:${offset}px;width:${width}px;background:${p.color};" title="${label}: ${fmtDate(s.from)} → ${fmtDate(s.to)}">${fmtDate(s.from)}–${fmtDate(s.to)}<small>${trip.name}</small></div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  wrap.innerHTML = html;
+}
+
+// ---------- STATS (sin plata) ----------
+function renderStats(){
+  const el = document.getElementById('stats');
+  const daysByPerson = {};
+  STAYS.forEach(s=>{ daysByPerson[s.person] = (daysByPerson[s.person]||0) + dayDiff(s.from,s.to); });
+  const maxPerson = Object.entries(daysByPerson).sort((a,b)=>b[1]-a[1])[0];
+  const today = new Date();
+  const enSitioAhora = STAYS.filter(s=> new Date(s.from)<=today && today<=new Date(s.to)).length;
+  const proximos = STAYS.filter(s=> new Date(s.from) > today).sort((a,b)=> new Date(a.from)-new Date(b.from));
+  const proxima = proximos[0];
+
+  const cards = [
+    { n: TRIPS.length, l:'Viajes / estadías cargadas' },
+    { n: PEOPLE[maxPerson[0]]?.name.split(' ')[0]+' · '+maxPerson[1]+'d', l:'Mayor tiempo en obra' },
+    { n: enSitioAhora, l:'Personas en obra hoy' },
+    { n: proxima ? fmtDate(proxima.from) : '—', l:'Próxima llegada' },
+  ];
+  el.innerHTML = cards.map(c=>`<div class="stat"><div class="n">${c.n}</div><div class="l">${c.l}</div></div>`).join('');
+}
+
+// ---------- COSTOS ----------
+function renderTrips(){
+  const el = document.getElementById('trips');
+  const totalLine = document.getElementById('costosTotalLine');
+  const allItems = TRIPS.flatMap(t=>t.items);
+  const totalUSD = allItems.reduce((s,i)=> s+toUSD(i.amount,i.cur),0);
+  const pagadoUSD = allItems.filter(i=>i.pagado).reduce((s,i)=> s+toUSD(i.amount,i.cur),0);
+  totalLine.innerHTML = `Acumulado a la fecha: <b>${fmtUSD(Math.round(totalUSD))}</b> · Cobrado/rendido: <b>${fmtUSD(Math.round(pagadoUSD))}</b> · Pendiente: <b>${fmtUSD(Math.round(totalUSD-pagadoUSD))}</b>`;
+
+  el.innerHTML = TRIPS.map((t, ti)=>{
+    const tUSD = t.items.reduce((s,i)=> s+toUSD(i.amount,i.cur),0);
+    const rows = t.items.map((i, ii)=>{
+      const usd = toUSD(i.amount,i.cur);
+      const pagado = !!i.pagado;
+      return `<tr class="${i.pend?'pend':''}">
+        <td>${editableName(i.c, 'trips.'+ti+'.items.'+ii+'.c')}</td>
+        <td class="num">${i.cur}</td>
+        <td class="num"><input type="number" value="${i.amount}" data-trip="${ti}" data-item="${ii}" onchange="updateAmount(this)"></td>
+        <td class="num">${fmtUSD(Math.round(usd))}</td>
+        <td class="num"><button class="estado-btn ${pagado?'estado-ok':'estado-pend'}" data-trip="${ti}" data-item="${ii}" onclick="togglePagado(this)">${pagado?'✔ Pagado':'Falta pagar'}</button></td>
+      </tr>`;
+    }).join('');
+    return `<div class="trip-card">
+      <div class="trip-head">
+        <div class="tname">${editableName(t.name, 'trips.'+ti+'.name')}</div>
+        <div class="tdates">${fmtDate(t.from)} → ${fmtDate(t.to)} · ${dayDiff(t.from,t.to)} días</div>
+        <div class="ttotal">${fmtUSD(Math.round(tUSD))}</div>
+      </div>
+      <div class="trip-body">
+        <div class="trip-people">Equipo: ${t.people.join(' · ')}</div>
+        <table class="costs">
+          <thead><tr><th>Concepto</th><th>Moneda</th><th>Monto</th><th>≈ USD</th><th>Estado</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function updateAmount(input){
+  const ti = +input.dataset.trip, ii = +input.dataset.item;
+  const trip = TRIPS[ti];
+  const newAmount = parseFloat(input.value)||0;
+  trip.items[ii].amount = newAmount;
+  trip.items[ii].pend = false;
+  renderTrips();
+  try{
+    await jsonp({ action:'updateAmount', tripId:trip.id, itemIndex:ii, monto:newAmount });
+  }catch(err){
+    alert('No se pudo guardar el monto en la planilla: ' + err.message);
+  }
+}
+async function togglePagado(btn){
+  const ti = +btn.dataset.trip, ii = +btn.dataset.item;
+  const trip = TRIPS[ti];
+  trip.items[ii].pagado = !trip.items[ii].pagado;
+  renderTrips();
+  try{
+    await jsonp({ action:'togglePagado', tripId:trip.id, itemIndex:ii });
+  }catch(err){
+    alert('No se pudo guardar el estado en la planilla: ' + err.message);
+  }
+}
+
+function renderAll(){
+  renderGantt();
+  renderStats();
+  renderTrips();
+  document.getElementById('editBadgeWrap').innerHTML = EDIT_MODE ? `<span class="edit-badge">Modo edición</span>` : '';
+}
+renderAll();
+loadData();
+</script>
+</body>
+</html>
