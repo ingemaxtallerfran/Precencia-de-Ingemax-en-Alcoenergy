@@ -106,7 +106,7 @@
   table.costs-flat tr:hover td{background:var(--naranja-dim2);}
   table.costs-flat input{background:transparent;border:none;border-bottom:1px dashed var(--gris4);color:var(--texto);font-family:var(--sans);font-size:14.5px;width:100%;padding:3px 0;}
   table.costs-flat input:focus{outline:none;border-bottom:1px solid var(--naranja);}
-  .c-viaje{font-family:var(--cond);font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;}
+  .c-viaje{font-family:var(--cond);font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;background:var(--gris2);border-right:1px solid var(--borde);vertical-align:middle;}
   .c-fechas{display:block;font-family:var(--cond);font-size:11.5px;color:var(--naranja);font-weight:700;text-transform:none;letter-spacing:.02em;margin-top:1px;}
   .c-empty{text-align:center;color:var(--gris5);font-family:var(--cond);padding:26px;}
   td.num{text-align:right;font-family:var(--sans);}
@@ -383,13 +383,15 @@ function renderTrips(){
     return `<button class="${f===costFilter?'active':''}" onclick="setCostFilter('${f}')">${label} <span class="fcount">${counts[f]}</span></button>`;
   }).join('');
 
-  // filas planas
+  // filas agrupadas por viaje, con la celda de Viaje unida (rowspan)
   let rowsHtml = '';
   TRIPS.forEach((t, ti)=>{
-    t.items.forEach((i, ii)=>{
+    const visibleItems = t.items
+      .map((i, ii)=>({ i, ii }))
+      .filter(({i})=> !(costFilter==='pendiente' && i.pagado) && !(costFilter==='pagado' && !i.pagado));
+    if(visibleItems.length===0) return;
+    visibleItems.forEach(({i, ii}, rowIdx)=>{
       const pagado = !!i.pagado;
-      if(costFilter==='pendiente' && pagado) return;
-      if(costFilter==='pagado' && !pagado) return;
       const usd = toUSD(i.amount,i.cur);
       const montoCell = EDIT_MODE
         ? `<input type="number" value="${i.amount}" data-trip="${ti}" data-item="${ii}" onchange="updateAmount(this)">`
@@ -397,8 +399,11 @@ function renderTrips(){
       const estadoCell = EDIT_MODE
         ? `<button class="estado-btn ${pagado?'estado-ok':'estado-pend'}" data-trip="${ti}" data-item="${ii}" onclick="togglePagado(this)">${pagado?'✔ Pagado':'Falta pagar'}</button>`
         : `<span class="estado-badge ${pagado?'estado-ok':'estado-pend'}">${pagado?'✔ Pagado':'Falta pagar'}</span>`;
+      const viajeCell = rowIdx===0
+        ? `<td class="c-viaje" rowspan="${visibleItems.length}">${editableName(t.name, 'trips.'+ti+'.name')}<span class="c-fechas">${fmtDate(t.from)}→${fmtDate(t.to)}</span></td>`
+        : '';
       rowsHtml += `<tr class="${i.pend?'pend':''}">
-        <td class="c-viaje">${editableName(t.name, 'trips.'+ti+'.name')}<span class="c-fechas">${fmtDate(t.from)}→${fmtDate(t.to)}</span></td>
+        ${viajeCell}
         <td>${editableName(i.c, 'trips.'+ti+'.items.'+ii+'.c')}</td>
         <td class="num">${i.cur}</td>
         <td class="num">${montoCell}</td>
