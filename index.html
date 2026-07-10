@@ -87,25 +87,36 @@
   .stat .l{font-family:var(--cond);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris5);font-weight:700;margin-top:2px;}
 
   /* ── COSTOS ── */
-  .costos-total-line{font-family:var(--cond);font-size:14.5px;color:var(--texto2);margin-bottom:16px;padding:11px 14px;background:var(--gris2);border-radius:var(--rsm);}
+  .costos-total-line{font-family:var(--cond);font-size:14.5px;color:var(--texto2);margin-bottom:14px;padding:11px 14px;background:var(--gris2);border-radius:var(--rsm);}
   .costos-total-line b{color:var(--texto);font-weight:800;}
-  .trip-card{background:var(--gris1);border:1px solid var(--borde);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;}
-  .trip-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:11px 15px;border-bottom:1px solid var(--borde);background:var(--gris2);}
-  .trip-head .tname{font-family:var(--cond);font-weight:800;font-size:16.5px;text-transform:uppercase;letter-spacing:.02em;}
-  .trip-head .tdates{font-family:var(--cond);font-size:13.5px;color:var(--naranja);font-weight:700;letter-spacing:.02em;}
-  .trip-head .ttotal{font-family:var(--cond);font-size:15px;font-weight:700;color:var(--texto2);}
-  .trip-body{padding:11px 15px;}
-  .trip-people{font-family:var(--cond);font-size:13.5px;color:var(--gris5);margin-bottom:11px;letter-spacing:.02em;}
-  table.costs{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:14.5px;}
-  table.costs th{text-align:left;font-family:var(--cond);text-transform:uppercase;font-size:11.5px;letter-spacing:.06em;color:var(--gris5);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--borde);}
-  table.costs td{padding:9px 10px;border-bottom:1px solid var(--gris2);}
-  table.costs input{background:transparent;border:none;border-bottom:1px dashed var(--gris4);color:var(--texto);font-family:var(--sans);font-size:14.5px;width:100%;padding:3px 0;}
-  table.costs input:focus{outline:none;border-bottom:1px solid var(--naranja);}
+
+  .cost-filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .cost-filter-bar button{
+    font-family:var(--cond);font-size:12.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+    border:1px solid var(--borde);border-radius:20px;padding:6px 14px;cursor:pointer;background:var(--gris1);color:var(--texto2);
+  }
+  .cost-filter-bar button.active{background:var(--naranja);border-color:var(--naranja);color:#fff;}
+  .cost-filter-bar .fcount{opacity:.75;margin-left:3px;}
+
+  .costs-table-wrap{background:var(--gris1);border:1px solid var(--borde);border-radius:var(--radius);overflow:auto;}
+  table.costs-flat{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:14.5px;}
+  table.costs-flat th{text-align:left;font-family:var(--cond);text-transform:uppercase;font-size:11.5px;letter-spacing:.06em;color:var(--gris5);font-weight:700;padding:10px 12px;border-bottom:1px solid var(--borde);background:var(--gris2);position:sticky;top:0;}
+  table.costs-flat td{padding:10px 12px;border-bottom:1px solid var(--gris2);vertical-align:top;}
+  table.costs-flat tr:last-child td{border-bottom:none;}
+  table.costs-flat tr:hover td{background:var(--naranja-dim2);}
+  table.costs-flat input{background:transparent;border:none;border-bottom:1px dashed var(--gris4);color:var(--texto);font-family:var(--sans);font-size:14.5px;width:100%;padding:3px 0;}
+  table.costs-flat input:focus{outline:none;border-bottom:1px solid var(--naranja);}
+  .c-viaje{font-family:var(--cond);font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;}
+  .c-fechas{display:block;font-family:var(--cond);font-size:11.5px;color:var(--naranja);font-weight:700;text-transform:none;letter-spacing:.02em;margin-top:1px;}
+  .c-empty{text-align:center;color:var(--gris5);font-family:var(--cond);padding:26px;}
   td.num{text-align:right;font-family:var(--sans);}
   .pend{color:var(--rojo);}
   .estado-btn{font-family:var(--cond);font-size:12.5px;font-weight:700;letter-spacing:.02em;border:1px solid var(--borde);border-radius:20px;padding:5px 13px;cursor:pointer;background:transparent;white-space:nowrap;}
   .estado-btn.estado-pend{color:var(--rojo);border-color:var(--rojo);}
   .estado-btn.estado-ok{color:#fff;background:var(--verde);border-color:var(--verde);}
+  .estado-badge{font-family:var(--cond);font-size:12.5px;font-weight:700;letter-spacing:.02em;border-radius:20px;padding:5px 13px;white-space:nowrap;display:inline-block;}
+  .estado-badge.estado-pend{color:var(--rojo);border:1px solid var(--rojo);background:transparent;}
+  .estado-badge.estado-ok{color:#fff;background:var(--verde);border:1px solid var(--verde);}
 
   .note{font-family:var(--cond);font-size:13.5px;color:var(--gris5);background:var(--gris2);border-left:3px solid var(--naranja);padding:10px 14px;letter-spacing:.02em;}
 
@@ -155,6 +166,7 @@
       <span class="hint">Tocá un monto para corregirlo. Tocá el estado para marcar pagado.</span>
     </div>
     <div class="costos-total-line" id="costosTotalLine"></div>
+    <div class="cost-filter-bar" id="costFilterBar"></div>
     <div id="trips"></div>
     <div class="note">Rojo = monto pendiente de confirmar. El estado de pago y las ediciones no quedan guardados al recargar — son para uso en el momento.</div>
   </section>
@@ -348,6 +360,13 @@ function renderStats(){
 }
 
 // ---------- COSTOS ----------
+let costFilter = 'todos'; // 'todos' | 'pendiente' | 'pagado'
+
+function setCostFilter(f){
+  costFilter = f;
+  renderTrips();
+}
+
 function renderTrips(){
   const el = document.getElementById('trips');
   const totalLine = document.getElementById('costosTotalLine');
@@ -356,34 +375,44 @@ function renderTrips(){
   const pagadoUSD = allItems.filter(i=>i.pagado).reduce((s,i)=> s+toUSD(i.amount,i.cur),0);
   totalLine.innerHTML = `Acumulado a la fecha: <b>${fmtUSD(Math.round(totalUSD))}</b> · Cobrado/rendido: <b>${fmtUSD(Math.round(pagadoUSD))}</b> · Pendiente: <b>${fmtUSD(Math.round(totalUSD-pagadoUSD))}</b>`;
 
-  el.innerHTML = TRIPS.map((t, ti)=>{
-    const tUSD = t.items.reduce((s,i)=> s+toUSD(i.amount,i.cur),0);
-    const rows = t.items.map((i, ii)=>{
-      const usd = toUSD(i.amount,i.cur);
+  // filtro
+  const filtroBar = document.getElementById('costFilterBar');
+  const counts = { todos: allItems.length, pendiente: allItems.filter(i=>!i.pagado).length, pagado: allItems.filter(i=>i.pagado).length };
+  filtroBar.innerHTML = ['todos','pendiente','pagado'].map(f=>{
+    const label = f==='todos'?'Todos':f==='pendiente'?'Falta pagar':'Pagados';
+    return `<button class="${f===costFilter?'active':''}" onclick="setCostFilter('${f}')">${label} <span class="fcount">${counts[f]}</span></button>`;
+  }).join('');
+
+  // filas planas
+  let rowsHtml = '';
+  TRIPS.forEach((t, ti)=>{
+    t.items.forEach((i, ii)=>{
       const pagado = !!i.pagado;
-      return `<tr class="${i.pend?'pend':''}">
+      if(costFilter==='pendiente' && pagado) return;
+      if(costFilter==='pagado' && !pagado) return;
+      const usd = toUSD(i.amount,i.cur);
+      const montoCell = EDIT_MODE
+        ? `<input type="number" value="${i.amount}" data-trip="${ti}" data-item="${ii}" onchange="updateAmount(this)">`
+        : `<span>${i.amount.toLocaleString('es-AR')}</span>`;
+      const estadoCell = EDIT_MODE
+        ? `<button class="estado-btn ${pagado?'estado-ok':'estado-pend'}" data-trip="${ti}" data-item="${ii}" onclick="togglePagado(this)">${pagado?'✔ Pagado':'Falta pagar'}</button>`
+        : `<span class="estado-badge ${pagado?'estado-ok':'estado-pend'}">${pagado?'✔ Pagado':'Falta pagar'}</span>`;
+      rowsHtml += `<tr class="${i.pend?'pend':''}">
+        <td class="c-viaje">${editableName(t.name, 'trips.'+ti+'.name')}<span class="c-fechas">${fmtDate(t.from)}→${fmtDate(t.to)}</span></td>
         <td>${editableName(i.c, 'trips.'+ti+'.items.'+ii+'.c')}</td>
         <td class="num">${i.cur}</td>
-        <td class="num"><input type="number" value="${i.amount}" data-trip="${ti}" data-item="${ii}" onchange="updateAmount(this)"></td>
+        <td class="num">${montoCell}</td>
         <td class="num">${fmtUSD(Math.round(usd))}</td>
-        <td class="num"><button class="estado-btn ${pagado?'estado-ok':'estado-pend'}" data-trip="${ti}" data-item="${ii}" onclick="togglePagado(this)">${pagado?'✔ Pagado':'Falta pagar'}</button></td>
+        <td class="num">${estadoCell}</td>
       </tr>`;
-    }).join('');
-    return `<div class="trip-card">
-      <div class="trip-head">
-        <div class="tname">${editableName(t.name, 'trips.'+ti+'.name')}</div>
-        <div class="tdates">${fmtDate(t.from)} → ${fmtDate(t.to)} · ${dayDiff(t.from,t.to)} días</div>
-        <div class="ttotal">${fmtUSD(Math.round(tUSD))}</div>
-      </div>
-      <div class="trip-body">
-        <div class="trip-people">Equipo: ${t.people.join(' · ')}</div>
-        <table class="costs">
-          <thead><tr><th>Concepto</th><th>Moneda</th><th>Monto</th><th>≈ USD</th><th>Estado</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    </div>`;
-  }).join('');
+    });
+  });
+  if(!rowsHtml) rowsHtml = `<tr><td colspan="6" class="c-empty">No hay ítems para este filtro.</td></tr>`;
+
+  el.innerHTML = `<div class="costs-table-wrap"><table class="costs-flat">
+    <thead><tr><th>Viaje</th><th>Concepto</th><th>Moneda</th><th>Monto</th><th>≈ USD</th><th>Estado</th></tr></thead>
+    <tbody>${rowsHtml}</tbody>
+  </table></div>`;
 }
 
 async function updateAmount(input){
