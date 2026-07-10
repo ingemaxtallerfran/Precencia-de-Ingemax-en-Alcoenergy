@@ -100,13 +100,14 @@
 
   .costs-table-wrap{background:var(--gris1);border:1px solid var(--borde);border-radius:var(--radius);overflow:auto;}
   table.costs-flat{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:14.5px;}
-  table.costs-flat th{text-align:left;font-family:var(--cond);text-transform:uppercase;font-size:11.5px;letter-spacing:.06em;color:var(--gris5);font-weight:700;padding:10px 12px;border-bottom:1px solid var(--borde);background:var(--gris2);position:sticky;top:0;}
-  table.costs-flat td{padding:10px 12px;border-bottom:1px solid var(--gris2);vertical-align:top;}
-  table.costs-flat tr:last-child td{border-bottom:none;}
+  table.costs-flat th{text-align:left;font-family:var(--cond);text-transform:uppercase;font-size:11.5px;letter-spacing:.06em;color:var(--gris5);font-weight:700;padding:10px 12px;border:1px solid var(--borde);background:var(--gris2);position:sticky;top:0;}
+  table.costs-flat td{padding:10px 12px;border:1px solid var(--gris3);vertical-align:top;}
   table.costs-flat tr:hover td{background:var(--naranja-dim2);}
+  table.costs-flat tr.group-start td{border-top:2px solid var(--gris4);}
+  table.costs-flat tfoot td{border-top:3px solid var(--naranja);border-bottom:none;font-family:var(--cond);font-weight:800;font-size:16.5px;padding:14px 12px;background:var(--gris2);}
   table.costs-flat input{background:transparent;border:none;border-bottom:1px dashed var(--gris4);color:var(--texto);font-family:var(--sans);font-size:14.5px;width:100%;padding:3px 0;}
   table.costs-flat input:focus{outline:none;border-bottom:1px solid var(--naranja);}
-  .c-viaje{font-family:var(--cond);font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;background:var(--gris2);border-right:1px solid var(--borde);vertical-align:middle;}
+  .c-viaje{font-family:var(--cond);font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;background:var(--gris2);vertical-align:middle;}
   .c-fechas{display:block;font-family:var(--cond);font-size:11.5px;color:var(--naranja);font-weight:700;text-transform:none;letter-spacing:.02em;margin-top:1px;}
   .c-empty{text-align:center;color:var(--gris5);font-family:var(--cond);padding:26px;}
   td.num{text-align:right;font-family:var(--sans);}
@@ -402,7 +403,7 @@ function renderTrips(){
       const viajeCell = rowIdx===0
         ? `<td class="c-viaje" rowspan="${visibleItems.length}">${editableName(t.name, 'trips.'+ti+'.name')}<span class="c-fechas">${fmtDate(t.from)}→${fmtDate(t.to)}</span></td>`
         : '';
-      rowsHtml += `<tr class="${i.pend?'pend':''}">
+      rowsHtml += `<tr class="${i.pend?'pend':''} ${rowIdx===0?'group-start':''}">
         ${viajeCell}
         <td>${editableName(i.c, 'trips.'+ti+'.items.'+ii+'.c')}</td>
         <td class="num">${i.cur}</td>
@@ -414,9 +415,21 @@ function renderTrips(){
   });
   if(!rowsHtml) rowsHtml = `<tr><td colspan="6" class="c-empty">No hay ítems para este filtro.</td></tr>`;
 
+  const visibleTotalUSD = TRIPS.flatMap(t=>t.items).filter(i=>{
+    if(costFilter==='pendiente') return !i.pagado;
+    if(costFilter==='pagado') return !!i.pagado;
+    return true;
+  }).reduce((s,i)=> s+toUSD(i.amount,i.cur),0);
+  const footerHtml = `<tfoot><tr>
+    <td colspan="4">TOTAL (${costFilter==='todos'?'todos los ítems':costFilter==='pendiente'?'falta pagar':'pagados'})</td>
+    <td class="num">${fmtUSD(Math.round(visibleTotalUSD))}</td>
+    <td></td>
+  </tr></tfoot>`;
+
   el.innerHTML = `<div class="costs-table-wrap"><table class="costs-flat">
     <thead><tr><th>Viaje</th><th>Concepto</th><th>Moneda</th><th>Monto</th><th>≈ USD</th><th>Estado</th></tr></thead>
     <tbody>${rowsHtml}</tbody>
+    ${footerHtml}
   </table></div>`;
 }
 
