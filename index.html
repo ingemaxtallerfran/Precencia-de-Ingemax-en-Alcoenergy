@@ -277,6 +277,11 @@ function renderGantt(){
   const legend = document.getElementById('legend');
   legend.innerHTML = Object.entries(PEOPLE).map(([id,p])=>`<span><i style="background:${p.color}"></i>${p.name}</span>`).join('');
 
+  if(!STAYS || STAYS.length===0){
+    wrap.innerHTML = '<div style="padding:20px;font-family:var(--cond);color:var(--gris5);">No hay estadías cargadas todavía.</div>';
+    return;
+  }
+
   const allDates = STAYS.flatMap(s=>[s.from,s.to]);
   const minDate = new Date(Math.min(...allDates.map(d=>new Date(d))));
   const maxDate = new Date(Math.max(...allDates.map(d=>new Date(d))));
@@ -412,7 +417,6 @@ function renderAll(){
   renderTrips();
   document.getElementById('editBadgeWrap').innerHTML = EDIT_MODE ? `<span class="edit-badge">Modo edición</span>` : '';
 }
-renderAll();
 loadData();
 </script>
 </body>
