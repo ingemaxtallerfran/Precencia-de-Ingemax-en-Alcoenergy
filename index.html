@@ -380,7 +380,7 @@ function renderTrips(){
   const filtroBar = document.getElementById('costFilterBar');
   const counts = { todos: allItems.length, pendiente: allItems.filter(i=>!i.pagado).length, pagado: allItems.filter(i=>i.pagado).length };
   filtroBar.innerHTML = ['todos','pendiente','pagado'].map(f=>{
-    const label = f==='todos'?'Todos':f==='pendiente'?'Falta pagar':'Pagados';
+    const label = f==='todos'?'Todos':f==='pendiente'?'Pendiente':'Pagados';
     return `<button class="${f===costFilter?'active':''}" onclick="setCostFilter('${f}')">${label} <span class="fcount">${counts[f]}</span></button>`;
   }).join('');
 
@@ -398,8 +398,8 @@ function renderTrips(){
         ? `<input type="number" value="${i.amount}" data-trip="${ti}" data-item="${ii}" onchange="updateAmount(this)">`
         : `<span>${i.amount.toLocaleString('es-AR')}</span>`;
       const estadoCell = EDIT_MODE
-        ? `<button class="estado-btn ${pagado?'estado-ok':'estado-pend'}" data-trip="${ti}" data-item="${ii}" onclick="togglePagado(this)">${pagado?'✔ Pagado':'Falta pagar'}</button>`
-        : `<span class="estado-badge ${pagado?'estado-ok':'estado-pend'}">${pagado?'✔ Pagado':'Falta pagar'}</span>`;
+        ? `<button class="estado-btn ${pagado?'estado-ok':'estado-pend'}" data-trip="${ti}" data-item="${ii}" onclick="togglePagado(this)">${pagado?'✔ Pagado':'Pendiente'}</button>`
+        : `<span class="estado-badge ${pagado?'estado-ok':'estado-pend'}">${pagado?'✔ Pagado':'Pendiente'}</span>`;
       const viajeCell = rowIdx===0
         ? `<td class="c-viaje" rowspan="${visibleItems.length}">${editableName(t.name, 'trips.'+ti+'.name')}<span class="c-fechas">${fmtDate(t.from)}→${fmtDate(t.to)}</span></td>`
         : '';
