@@ -123,6 +123,37 @@
 
   footer{padding:20px 0;color:var(--gris5);font-family:var(--cond);font-size:11px;border-top:1px solid var(--borde);margin-top:14px;letter-spacing:.03em;}
 
+  /* ── NUEVO VIAJE ── */
+  .new-trip-btn{font-family:var(--cond);font-size:13.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;background:var(--naranja);border:none;color:#fff;padding:9px 18px;border-radius:var(--rsm);cursor:pointer;margin-bottom:14px;}
+  .new-trip-btn:hover{opacity:.9;}
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:flex;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto;}
+  .modal-box{background:var(--gris1);border-top:3px solid var(--naranja);border-radius:var(--radius);width:100%;max-width:600px;padding:24px;}
+  .modal-box h3{font-family:var(--cond);font-size:22px;font-weight:800;margin-bottom:16px;}
+  .form-row{margin-bottom:14px;display:flex;flex-direction:column;gap:6px;}
+  .form-row label{font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gris5);}
+  .form-row input[type=text],.form-row input[type=date],.form-row input[type=number]{background:var(--gris2);border:1px solid var(--borde);color:var(--texto);padding:9px 11px;border-radius:var(--rsm);font-family:var(--sans);font-size:14px;outline:none;width:100%;}
+  .form-row input:focus{border-color:var(--naranja);}
+  .form-row-2{display:flex;gap:12px;}
+  .form-row-2 .form-row{flex:1;}
+  .nt-personas{display:flex;gap:10px;flex-wrap:wrap;}
+  .nt-personas label{display:flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13.5px;color:var(--texto);text-transform:none;letter-spacing:0;font-weight:500;background:var(--gris2);border:1px solid var(--borde);border-radius:20px;padding:6px 12px;cursor:pointer;}
+  .nt-personas input{accent-color:var(--naranja);}
+  .nt-indiv-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;background:var(--gris2);border:1px solid var(--borde);border-radius:var(--rsm);padding:8px 10px;}
+  .nt-indiv-row .nt-indiv-name{font-family:var(--cond);font-size:13px;font-weight:700;flex:0 0 120px;}
+  .nt-indiv-row input[type=date]{flex:1;padding:7px 8px;font-size:13px;}
+  .nt-indiv-row input[type=text]{flex:1;padding:7px 8px;font-size:13px;}
+  .nt-item-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
+  .nt-item-row input[type=text]{flex:2;}
+  .nt-item-row input[type=number]{flex:1;}
+  .nt-item-row select{background:var(--gris2);border:1px solid var(--borde);border-radius:var(--rsm);color:var(--texto);padding:9px 8px;font-family:var(--sans);font-size:14px;}
+  .nt-item-row button{background:none;border:none;color:var(--gris5);cursor:pointer;font-size:16px;padding:4px 8px;}
+  .nt-item-row button:hover{color:var(--rojo);}
+  .mini-btn{font-family:var(--cond);font-size:12px;font-weight:700;background:transparent;border:1px dashed var(--gris4);color:var(--texto2);border-radius:var(--rsm);padding:7px 12px;cursor:pointer;letter-spacing:.03em;}
+  .mini-btn:hover{border-color:var(--naranja);color:var(--naranja);}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
+  .btn-cancel{background:transparent;border:1px solid var(--borde);color:var(--texto2);padding:10px 18px;border-radius:var(--rsm);font-family:var(--cond);font-size:14px;font-weight:700;cursor:pointer;}
+  .btn-save{background:var(--naranja);border:none;color:#fff;padding:10px 20px;border-radius:var(--rsm);font-family:var(--cond);font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.03em;text-transform:uppercase;}
+
   @media (max-width:768px){
     .gantt-ruler .rl,.gantt-row .rl{min-width:130px;flex:0 0 130px;}
     h1{font-size:22px;}
@@ -166,6 +197,7 @@
       <h2>Costos por viaje</h2>
       <span class="hint">Tocá un monto para corregirlo. Tocá el estado para marcar pagado.</span>
     </div>
+    <div id="newTripBtnWrap"></div>
     <div class="costos-total-line" id="costosTotalLine"></div>
     <div class="cost-filter-bar" id="costFilterBar"></div>
     <div id="trips"></div>
@@ -173,6 +205,37 @@
   </section>
 
   <footer>INGEMAX S.A. · Herramienta interna de seguimiento de viajes a obra</footer>
+
+  <div class="modal-backdrop" id="newTripModal" style="display:none;">
+    <div class="modal-box">
+      <h3>Nuevo viaje</h3>
+      <div class="form-row">
+        <label>Nombre del viaje</label>
+        <input type="text" id="ntNombre" placeholder="Ej: Viaje de seguimiento agosto">
+      </div>
+      <div class="form-row-2">
+        <div class="form-row"><label>Desde</label><input type="date" id="ntDesde"></div>
+        <div class="form-row"><label>Hasta</label><input type="date" id="ntHasta"></div>
+      </div>
+      <div class="form-row">
+        <label>Personas que viajan</label>
+        <div class="nt-personas" id="ntPersonas"></div>
+      </div>
+      <div class="form-row" id="ntFechasIndivWrap" style="display:none;">
+        <label>Fechas de cada uno (por si alguien viaja o vuelve en otra fecha)</label>
+        <div id="ntFechasIndiv"></div>
+      </div>
+      <div class="form-row">
+        <label>Costos del viaje</label>
+        <div id="ntItems"></div>
+        <button type="button" class="mini-btn" onclick="addItemRow()">+ Agregar ítem de costo</button>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeNewTripModal()">Cancelar</button>
+        <button type="button" class="btn-save" onclick="submitNewTrip()">Guardar viaje</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -463,8 +526,123 @@ function renderAll(){
   renderStats();
   renderTrips();
   document.getElementById('editBadgeWrap').innerHTML = EDIT_MODE ? `<span class="edit-badge">Modo edición</span>` : '';
+  document.getElementById('newTripBtnWrap').innerHTML = EDIT_MODE ? `<button class="new-trip-btn" onclick="openNewTripModal()">+ Nuevo viaje</button>` : '';
 }
 loadData();
+
+// ---------- NUEVO VIAJE (modo edición) ----------
+function openNewTripModal(){
+  document.getElementById('ntNombre').value = '';
+  document.getElementById('ntDesde').value = '';
+  document.getElementById('ntHasta').value = '';
+  document.getElementById('ntPersonas').innerHTML = Object.entries(PEOPLE).map(([id,p])=>
+    `<label><input type="checkbox" value="${id}" onchange="renderFechasIndiv()"> ${p.name}</label>`
+  ).join('');
+  document.getElementById('ntFechasIndivWrap').style.display = 'none';
+  document.getElementById('ntFechasIndiv').innerHTML = '';
+  document.getElementById('ntDesde').oninput = renderFechasIndiv;
+  document.getElementById('ntHasta').oninput = renderFechasIndiv;
+  document.getElementById('ntItems').innerHTML = '';
+  addItemRow();
+  document.getElementById('newTripModal').style.display = 'flex';
+}
+function renderFechasIndiv(){
+  const desde = document.getElementById('ntDesde').value;
+  const hasta = document.getElementById('ntHasta').value;
+  const checked = Array.from(document.querySelectorAll('#ntPersonas input:checked')).map(i=>i.value);
+  const wrap = document.getElementById('ntFechasIndiv');
+  const wrapOuter = document.getElementById('ntFechasIndivWrap');
+
+  // guardamos lo ya tipeado antes de re-renderizar, para no perderlo
+  const previo = {};
+  wrap.querySelectorAll('.nt-indiv-row').forEach(row=>{
+    previo[row.dataset.person] = {
+      from: row.querySelector('.nt-indiv-from').value,
+      to: row.querySelector('.nt-indiv-to').value,
+      nota: row.querySelector('.nt-indiv-nota').value,
+    };
+  });
+
+  if(checked.length===0){ wrapOuter.style.display='none'; wrap.innerHTML=''; return; }
+  wrapOuter.style.display = 'block';
+  wrap.innerHTML = checked.map(id=>{
+    const p = previo[id] || {};
+    return `<div class="nt-indiv-row" data-person="${id}">
+      <span class="nt-indiv-name">${PEOPLE[id].name}</span>
+      <input type="date" class="nt-indiv-from" value="${p.from||desde||''}">
+      <input type="date" class="nt-indiv-to" value="${p.to||hasta||''}">
+      <input type="text" class="nt-indiv-nota" placeholder="Nota (opcional, ej: viaja solo)" value="${p.nota||''}">
+    </div>`;
+  }).join('');
+}
+function closeNewTripModal(){
+  document.getElementById('newTripModal').style.display = 'none';
+}
+function addItemRow(){
+  const wrap = document.getElementById('ntItems');
+  const row = document.createElement('div');
+  row.className = 'nt-item-row';
+  row.innerHTML = `
+    <input type="text" placeholder="Concepto (ej: Vuelo Alejandro)" class="nt-c">
+    <select class="nt-cur"><option value="USD">USD</option><option value="ARS">ARS</option></select>
+    <input type="number" placeholder="Monto" class="nt-amount">
+    <button type="button" onclick="this.parentElement.remove()">✕</button>
+  `;
+  wrap.appendChild(row);
+}
+async function submitNewTrip(){
+  const nombre = document.getElementById('ntNombre').value.trim();
+  const desde = document.getElementById('ntDesde').value;
+  const hasta = document.getElementById('ntHasta').value;
+  const personasChecked = Array.from(document.querySelectorAll('#ntPersonas input:checked')).map(i=>i.value);
+
+  if(!nombre || !desde || !hasta){ alert('Completá nombre, desde y hasta.'); return; }
+  if(personasChecked.length===0){ alert('Marcá al menos una persona.'); return; }
+  if(new Date(hasta) < new Date(desde)){ alert('La fecha "hasta" no puede ser anterior a "desde".'); return; }
+
+  const equipo = personasChecked.map(id=>{
+    const row = document.querySelector(`.nt-indiv-row[data-person="${id}"]`);
+    const nota = row?.querySelector('.nt-indiv-nota').value.trim() || '';
+    return nota ? `${PEOPLE[id].name} (${nota})` : PEOPLE[id].name;
+  }).join(', ');
+  const stays = personasChecked.map(id=>{
+    const row = document.querySelector(`.nt-indiv-row[data-person="${id}"]`);
+    const from = row?.querySelector('.nt-indiv-from').value || desde;
+    const to = row?.querySelector('.nt-indiv-to').value || hasta;
+    const nota = row?.querySelector('.nt-indiv-nota').value.trim() || '';
+    return { person:id, from, to, suffix: nota ? `(${nota})` : '' };
+  });
+
+  for(const s of stays){
+    if(new Date(s.to) < new Date(s.from)){
+      alert(`La fecha "hasta" de ${PEOPLE[s.person].name} no puede ser anterior a su "desde".`);
+      return;
+    }
+  }
+
+  const items = Array.from(document.querySelectorAll('#ntItems .nt-item-row')).map(row=>({
+    c: row.querySelector('.nt-c').value.trim(),
+    cur: row.querySelector('.nt-cur').value,
+    amount: parseFloat(row.querySelector('.nt-amount').value) || 0,
+  })).filter(it=> it.c !== '');
+
+  const btn = document.querySelector('.btn-save');
+  btn.disabled = true; btn.textContent = 'Guardando…';
+  try{
+    const res = await jsonp({
+      action:'addTrip', nombre, desde, hasta, equipo,
+      itemsJson: JSON.stringify(items),
+      staysJson: JSON.stringify(stays),
+    });
+    if(!res.ok) throw new Error(res.error || 'Error desconocido');
+    closeNewTripModal();
+    await loadData();
+  }catch(err){
+    alert('No se pudo guardar el viaje: ' + err.message);
+  }finally{
+    btn.disabled = false; btn.textContent = 'Guardar viaje';
+  }
+}
 </script>
 </body>
 </html>
