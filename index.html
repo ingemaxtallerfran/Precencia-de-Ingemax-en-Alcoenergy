@@ -288,9 +288,9 @@
   </div>
 
   <header>
-    <div class="eyebrow">Seguimiento de obra</div>
-    <h1>Dirección técnica de obra</h1>
-    <p class="subt">Contrato, certificados y calendario de presencia en obra para proyecto AlcoEnergy.</p>
+    <div class="eyebrow" id="headerEyebrow">Contrato</div>
+    <h1 id="headerTitle">Contrato AlcoEnergy</h1>
+    <p class="subt" id="headerSubt">Alcance, ítems y forma de pago acordados con AlcoEnergy.</p>
   </header>
 
   <nav class="tabnav" id="tabnav">
@@ -332,7 +332,7 @@
 
     <section>
       <div class="sec-head">
-        <h2>Cobro mensual — Ítem C + Ítem D + Viáticos</h2>
+        <h2>Certificados de cobro mensual</h2>
         <span class="hint">Tocá el estado para marcar cobrado.</span>
       </div>
       <div class="big-stats" id="certMensualBigStats"></div>
@@ -356,7 +356,7 @@
 
     <section>
       <div class="sec-head">
-        <h2>Detalle de certificados OSBL por subcontratista</h2>
+        <h2>Certificados OSBL por subcontratista</h2>
         <span class="hint">Tocá el estado para marcar cobrado.</span>
       </div>
       <div id="certOsblWrap"></div>
@@ -481,6 +481,13 @@ let CONTRATO = [];
 let CERT_MENSUAL = [];
 let CERT_OSBL = [];
 
+const MODULE_HEADERS = {
+  contrato:      { eyebrow:'Contrato',     title:'Contrato AlcoEnergy',     subt:'Alcance, ítems y forma de pago acordados con AlcoEnergy.' },
+  certificados:  { eyebrow:'Certificados', title:'Certificados de cobro',   subt:'Cobro mensual a AlcoEnergy — Ítem C, Ítem D y viáticos.' },
+  osbl:          { eyebrow:'OSBL',         title:'Honorarios OSBL',         subt:'Nota de honorarios y certificados por subcontratista.' },
+  presencia:     { eyebrow:'Seguimiento de obra', title:'Presencia en obra', subt:'Calendario de estadías y costos de cada viaje.' },
+};
+
 // ---------- NAVEGACIÓN DE MÓDULOS ----------
 function showModule(name){
   ['presencia','contrato','certificados','osbl'].forEach(m=>{
@@ -489,6 +496,12 @@ function showModule(name){
   document.querySelectorAll('.tabnav-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.mod===name);
   });
+  const h = MODULE_HEADERS[name];
+  if(h){
+    document.getElementById('headerEyebrow').textContent = h.eyebrow;
+    document.getElementById('headerTitle').textContent = h.title;
+    document.getElementById('headerSubt').textContent = h.subt;
+  }
   if(name==='presencia') renderGantt(); // recalcula ancho por si el módulo estaba oculto al cargar
 }
 
