@@ -288,9 +288,9 @@
   </div>
 
   <header>
-    <div class="eyebrow" id="headerEyebrow">Contrato</div>
-    <h1 id="headerTitle">Contrato AlcoEnergy</h1>
-    <p class="subt" id="headerSubt">Alcance, ítems y forma de pago acordados con AlcoEnergy.</p>
+    <div class="eyebrow" id="headerEyebrow">Seguimiento de obra</div>
+    <h1 id="headerTitle">Dirección técnica de obra</h1>
+    <p class="subt" id="headerSubt">Contrato, certificados y calendario de presencia en obra para proyecto AlcoEnergy.</p>
   </header>
 
   <nav class="tabnav" id="tabnav">
@@ -347,10 +347,11 @@
 
     <section>
       <div class="sec-head">
-        <h2>Nota de honorarios OSBL a cobrar a AlcoEnergy</h2>
+        <h2>Totales certificados OSBL</h2>
         <span class="hint">Calculada automáticamente a partir del detalle de certificados, agrupada por mes.</span>
       </div>
       <div class="big-stats" id="osblBigStats"></div>
+      <h3 class="sub-head">Honorarios</h3>
       <div id="osblNotaWrap"></div>
     </section>
 
@@ -496,12 +497,6 @@ function showModule(name){
   document.querySelectorAll('.tabnav-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.mod===name);
   });
-  const h = MODULE_HEADERS[name];
-  if(h){
-    document.getElementById('headerEyebrow').textContent = h.eyebrow;
-    document.getElementById('headerTitle').textContent = h.title;
-    document.getElementById('headerSubt').textContent = h.subt;
-  }
   if(name==='presencia') renderGantt(); // recalcula ancho por si el módulo estaba oculto al cargar
 }
 
