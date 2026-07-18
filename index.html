@@ -123,6 +123,50 @@
 
   footer{padding:20px 0;color:var(--gris5);font-family:var(--cond);font-size:11px;border-top:1px solid var(--borde);margin-top:14px;letter-spacing:.03em;}
 
+  /* ── NAV DE MÓDULOS ── */
+  .tabnav{display:flex;gap:6px;margin-bottom:26px;border-bottom:2px solid var(--borde);}
+  .tabnav-btn{
+    font-family:var(--cond);font-size:15px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;
+    background:transparent;border:none;color:var(--gris5);padding:12px 20px;cursor:pointer;
+    border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;
+  }
+  .tabnav-btn:hover{color:var(--texto);}
+  .tabnav-btn.active{color:var(--naranja);border-bottom-color:var(--naranja);}
+
+  /* ── LETTERHEAD CONTRATO ── */
+  .contrato-letterhead{background:var(--gris1);border:1px solid var(--borde);border-radius:var(--radius);padding:26px 30px;margin-bottom:20px;}
+  .cl-logos{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--borde);}
+  .cl-alcoenergy{font-family:var(--sans);font-size:22px;font-weight:700;color:#2f9e44;letter-spacing:-.01em;}
+  .cl-alcoenergy span{font-weight:400;color:#1c7ed6;}
+  .cl-title{text-align:center;margin-bottom:18px;}
+  .cl-eyebrow{font-family:var(--cond);font-size:12px;font-style:italic;color:var(--gris5);margin-bottom:4px;}
+  .cl-title h2{font-family:var(--cond);font-size:26px;font-weight:800;text-transform:uppercase;letter-spacing:.02em;margin-bottom:4px;}
+  .cl-date{font-family:var(--cond);font-size:13px;color:var(--naranja);font-weight:700;}
+  .cl-meta{font-family:var(--sans);font-size:14px;line-height:1.9;color:var(--texto2);margin-bottom:18px;}
+  .cl-meta b{color:var(--texto);font-weight:700;}
+  .cl-download{
+    display:inline-block;font-family:var(--cond);font-size:13.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;
+    background:var(--naranja);color:#fff;text-decoration:none;padding:10px 20px;border-radius:var(--rsm);
+  }
+  .cl-download:hover{opacity:.9;}
+
+  /* ── STATS GRANDES (Certificados / OSBL: le damos peso a la plata) ── */
+  .big-stats{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
+  .big-stat{flex:1;min-width:200px;background:var(--gris1);border:1px solid var(--borde);border-radius:var(--radius);padding:20px 22px;border-top:4px solid var(--gris4);}
+  .big-stat.bs-total{border-top-color:var(--texto2);}
+  .big-stat.bs-cobrado{border-top-color:var(--verde);}
+  .big-stat.bs-pendiente{border-top-color:var(--rojo);}
+  .big-stat .bs-n{font-family:var(--cond);font-size:38px;font-weight:800;color:var(--texto);letter-spacing:-.01em;}
+  .big-stat.bs-cobrado .bs-n{color:var(--verde);}
+  .big-stat.bs-pendiente .bs-n{color:var(--rojo);}
+  .big-stat .bs-l{font-family:var(--cond);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris5);font-weight:700;margin-top:4px;}
+
+  /* Certificados / OSBL: tablas con más peso que las de costos de viaje */
+  #mod-certificados table.costs-flat,#mod-osbl table.costs-flat{font-size:15.5px;}
+  #mod-certificados table.costs-flat th,#mod-osbl table.costs-flat th{font-size:12.5px;padding:12px 14px;}
+  #mod-certificados table.costs-flat td,#mod-osbl table.costs-flat td{padding:13px 14px;}
+  #mod-certificados .c-viaje,#mod-osbl .c-viaje{font-size:16px;}
+
   /* ── FACTURACIÓN ── */
   .sub-head{font-family:var(--cond);font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;margin:22px 0 10px;color:var(--texto2);}
   table.contrato-tbl{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:13.5px;background:var(--gris1);border:1px solid var(--borde);border-radius:var(--radius);overflow:hidden;}
@@ -189,54 +233,109 @@
   <header>
     <div class="eyebrow">Seguimiento de obra</div>
     <h1>Presencia del equipo en Paraguay</h1>
-    <p class="subt">Calendario de estadías y costos asociados a cada viaje.</p>
+    <p class="subt">Calendario de estadías, contrato y facturación del proyecto AlcoEnergy.</p>
   </header>
 
-  <section>
-    <div class="sec-head">
-      <h2>Calendario de presencia</h2>
-      <span class="hint">Cada barra es la estadía de una persona. Pasá el mouse para ver el detalle.</span>
-    </div>
-    <div class="legend" id="legend"></div>
-    <div class="gantt-wrap"><div class="gantt" id="gantt"></div></div>
-  </section>
+  <nav class="tabnav" id="tabnav">
+    <button class="tabnav-btn active" data-mod="presencia" onclick="showModule('presencia')">Presencia</button>
+    <button class="tabnav-btn" data-mod="contrato" onclick="showModule('contrato')">Contrato</button>
+    <button class="tabnav-btn" data-mod="certificados" onclick="showModule('certificados')">Certificados</button>
+    <button class="tabnav-btn" data-mod="osbl" onclick="showModule('osbl')">OSBL</button>
+  </nav>
 
-  <section>
-    <div class="sec-head"><h2>En números</h2></div>
-    <div class="stats" id="stats"></div>
-  </section>
+  <!-- ═══════════ MÓDULO 1 — PRESENCIA ═══════════ -->
+  <div class="module" id="mod-presencia">
 
-  <section>
-    <div class="sec-head">
-      <h2>Costos por viaje</h2>
-      <span class="hint">Tocá un monto para corregirlo. Tocá el estado para marcar pagado.</span>
-    </div>
-    <div id="newTripBtnWrap"></div>
-    <div class="costos-total-line" id="costosTotalLine"></div>
-    <div class="cost-filter-bar" id="costFilterBar"></div>
-    <div id="trips"></div>
-    <div class="note">Rojo = monto pendiente de confirmar. El estado de pago y las ediciones no quedan guardados al recargar — son para uso en el momento.</div>
-  </section>
+    <section>
+      <div class="sec-head">
+        <h2>Calendario de presencia</h2>
+        <span class="hint">Cada barra es la estadía de una persona. Pasá el mouse para ver el detalle.</span>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="gantt-wrap" id="gantt-wrap"><div class="gantt" id="gantt"></div></div>
+    </section>
 
-  <section>
-    <div class="sec-head">
-      <h2>Facturación</h2>
-      <span class="hint">Contrato de referencia, cobro mensual consolidado y detalle de certificados OSBL.</span>
-    </div>
+    <section>
+      <div class="sec-head"><h2>En números</h2></div>
+      <div class="stats" id="stats"></div>
+    </section>
 
-    <h3 class="sub-head">Contrato (referencia fija)</h3>
-    <div id="contratoWrap"></div>
+    <section>
+      <div class="sec-head">
+        <h2>Costos por viaje</h2>
+        <span class="hint">Tocá un monto para corregirlo. Tocá el estado para marcar pagado.</span>
+      </div>
+      <div id="newTripBtnWrap"></div>
+      <div class="costos-total-line" id="costosTotalLine"></div>
+      <div class="cost-filter-bar" id="costFilterBar"></div>
+      <div id="trips"></div>
+      <div class="note">Rojo = monto pendiente de confirmar. El estado de pago y las ediciones no quedan guardados al recargar — son para uso en el momento.</div>
+    </section>
 
-    <h3 class="sub-head">Cobro mensual (Ítem C + Ítem D + viáticos)</h3>
-    <div class="costos-total-line" id="certMensualTotalLine"></div>
-    <div id="certMensualWrap"></div>
+  </div>
 
-    <h3 class="sub-head">Nota de honorarios OSBL a facturar a AlcoEnergy, por mes</h3>
-    <div id="osblNotaWrap"></div>
+  <!-- ═══════════ MÓDULO 2 — CONTRATO ═══════════ -->
+  <div class="module" id="mod-contrato" style="display:none;">
 
-    <h3 class="sub-head">Detalle de certificados OSBL por subcontratista</h3>
-    <div id="certOsblWrap"></div>
-  </section>
+    <section>
+      <div class="contrato-letterhead">
+        <div class="cl-logos">
+          <div class="logo-box"><div class="logo-text">INGE<span>MAX</span></div></div>
+          <div class="cl-alcoenergy">alco<span>energy</span></div>
+        </div>
+        <div class="cl-title">
+          <div class="cl-eyebrow">Servicios Profesionales Internacionales · Auditoría Técnica, Dirección Técnica e Ingeniería de Valor</div>
+          <h2>Propuesta / Contrato de Dirección Técnica</h2>
+          <div class="cl-date">12 / 05 / 2026</div>
+        </div>
+        <div class="cl-meta">
+          <div><b>Comitente:</b> AlcoEnergy</div>
+          <div><b>Obra:</b> Planta Industrial de Etanol AlcoEnergy — Capacidad nominal 100 m³/día</div>
+          <div><b>Ubicación:</b> Ñu Ruguá, camino a la Pastora, a 700 m de Ruta PY-08 — Coronel Oviedo, Paraguay</div>
+          <div><b>Atención:</b> Sr. Cristhian Machuca</div>
+        </div>
+        <a class="cl-download" href="contrato-ingemax-alcoenergy.pdf" target="_blank" rel="noopener">⬇ Descargar contrato original (PDF)</a>
+      </div>
+      <div id="contratoWrap"></div>
+    </section>
+
+  </div>
+
+  <!-- ═══════════ MÓDULO 3 — CERTIFICADOS ═══════════ -->
+  <div class="module" id="mod-certificados" style="display:none;">
+
+    <section>
+      <div class="sec-head">
+        <h2>Cobro mensual — Ítem C + Ítem D + Viáticos</h2>
+        <span class="hint">Tocá el estado para marcar cobrado.</span>
+      </div>
+      <div class="big-stats" id="certMensualBigStats"></div>
+      <div id="certMensualWrap"></div>
+    </section>
+
+  </div>
+
+  <!-- ═══════════ MÓDULO 4 — OSBL ═══════════ -->
+  <div class="module" id="mod-osbl" style="display:none;">
+
+    <section>
+      <div class="sec-head">
+        <h2>Nota de honorarios OSBL a facturar a AlcoEnergy</h2>
+        <span class="hint">Calculada automáticamente a partir del detalle de certificados, agrupada por mes.</span>
+      </div>
+      <div class="big-stats" id="osblBigStats"></div>
+      <div id="osblNotaWrap"></div>
+    </section>
+
+    <section>
+      <div class="sec-head">
+        <h2>Detalle de certificados OSBL por subcontratista</h2>
+        <span class="hint">Tocá el estado para marcar facturado.</span>
+      </div>
+      <div id="certOsblWrap"></div>
+    </section>
+
+  </div>
 
   <footer>INGEMAX S.A. · Herramienta interna de seguimiento de viajes a obra</footer>
 
@@ -286,6 +385,17 @@ let STAYS = [];
 let CONTRATO = [];
 let CERT_MENSUAL = [];
 let CERT_OSBL = [];
+
+// ---------- NAVEGACIÓN DE MÓDULOS ----------
+function showModule(name){
+  ['presencia','contrato','certificados','osbl'].forEach(m=>{
+    document.getElementById('mod-'+m).style.display = (m===name) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tabnav-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.mod===name);
+  });
+  if(name==='presencia') renderGantt(); // recalcula ancho por si el módulo estaba oculto al cargar
+}
 
 // ---------- JSONP helper (mismo patrón que tus otras apps) ----------
 let _jsonpCounter = 0;
@@ -404,7 +514,11 @@ function renderGantt(){
   minDate.setDate(minDate.getDate()-3);
   maxDate.setDate(maxDate.getDate()+3);
   const totalDays = dayDiff(minDate.toISOString().slice(0,10), maxDate.toISOString().slice(0,10));
-  const pxPerDay = 20;
+
+  // ancho disponible = ancho del contenedor menos la columna de nombres (210px) y un margen chico
+  const wrapOuter = document.getElementById('gantt-wrap') || wrap.parentElement;
+  const availableWidth = Math.max((wrapOuter.clientWidth || 1200) - 210 - 4, 300);
+  const pxPerDay = Math.max(availableWidth / totalDays, 5); // nunca menos de 5px/día
   const trackWidth = totalDays*pxPerDay;
 
   let months = [];
@@ -595,8 +709,8 @@ async function toggleCertMensual(certId, btn){
 
 function renderCertMensual(){
   const el = document.getElementById('certMensualWrap');
-  const totalLine = document.getElementById('certMensualTotalLine');
-  if(!CERT_MENSUAL.length){ el.innerHTML = '<div class="c-empty">Sin certificados cargados.</div>'; totalLine.innerHTML=''; return; }
+  const bigStats = document.getElementById('certMensualBigStats');
+  if(!CERT_MENSUAL.length){ el.innerHTML = '<div class="c-empty">Sin certificados cargados.</div>'; bigStats.innerHTML=''; return; }
 
   const certIds = [...new Set(CERT_MENSUAL.map(r=>Number(r.certId)))];
   const totalFacturado = certIds.reduce((s,id)=>{
@@ -607,7 +721,11 @@ function renderCertMensual(){
     const r = CERT_MENSUAL.find(x=>Number(x.certId)===id);
     return s + (r && r.estado==='Cobrado' ? r.totalMes : 0);
   }, 0);
-  totalLine.innerHTML = `Facturado a la fecha: <b>${fmtUSD(Math.round(totalFacturado))}</b> · Cobrado: <b>${fmtUSD(Math.round(totalCobrado))}</b> · Pendiente: <b>${fmtUSD(Math.round(totalFacturado-totalCobrado))}</b>`;
+  bigStats.innerHTML = `
+    <div class="big-stat bs-total"><div class="bs-n">${fmtUSD(Math.round(totalFacturado))}</div><div class="bs-l">Facturado a la fecha</div></div>
+    <div class="big-stat bs-cobrado"><div class="bs-n">${fmtUSD(Math.round(totalCobrado))}</div><div class="bs-l">Cobrado</div></div>
+    <div class="big-stat bs-pendiente"><div class="bs-n">${fmtUSD(Math.round(totalFacturado-totalCobrado))}</div><div class="bs-l">Pendiente de cobro</div></div>
+  `;
 
   let rowsHtml = '';
   certIds.forEach(certId=>{
@@ -644,7 +762,17 @@ function renderCertMensual(){
 // ---------- FACTURACIÓN: Nota mensual OSBL (calculada) ----------
 function renderOsblNota(){
   const el = document.getElementById('osblNotaWrap');
-  if(!CERT_OSBL.length){ el.innerHTML = '<div class="c-empty">Sin certificados OSBL cargados.</div>'; return; }
+  const bigStats = document.getElementById('osblBigStats');
+  if(!CERT_OSBL.length){ el.innerHTML = '<div class="c-empty">Sin certificados OSBL cargados.</div>'; bigStats.innerHTML=''; return; }
+
+  const totalHonorarios = CERT_OSBL.reduce((s,r)=>s+r.honorarioUSD,0);
+  const totalFacturado = CERT_OSBL.filter(r=>r.estado==='Facturado').reduce((s,r)=>s+r.honorarioUSD,0);
+  bigStats.innerHTML = `
+    <div class="big-stat bs-total"><div class="bs-n">${fmtUSD(Math.round(totalHonorarios))}</div><div class="bs-l">Honorarios OSBL totales</div></div>
+    <div class="big-stat bs-cobrado"><div class="bs-n">${fmtUSD(Math.round(totalFacturado))}</div><div class="bs-l">Ya facturado</div></div>
+    <div class="big-stat bs-pendiente"><div class="bs-n">${fmtUSD(Math.round(totalHonorarios-totalFacturado))}</div><div class="bs-l">Pendiente de facturar</div></div>
+  `;
+
   const meses = [...new Set(CERT_OSBL.map(r=>r.mesFacturacion))].sort();
   el.innerHTML = meses.map(mes=>{
     const items = CERT_OSBL.filter(r=>r.mesFacturacion===mes);
@@ -720,6 +848,13 @@ function renderAll(){
   document.getElementById('newTripBtnWrap').innerHTML = EDIT_MODE ? `<button class="new-trip-btn" onclick="openNewTripModal()">+ Nuevo viaje</button>` : '';
 }
 loadData();
+let _resizeTimer;
+window.addEventListener('resize', ()=>{
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(()=>{
+    if(document.getElementById('mod-presencia').style.display !== 'none') renderGantt();
+  }, 150);
+});
 
 // ---------- NUEVO VIAJE (modo edición) ----------
 function openNewTripModal(){
