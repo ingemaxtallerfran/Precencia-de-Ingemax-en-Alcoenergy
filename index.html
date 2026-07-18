@@ -166,6 +166,33 @@
   #mod-certificados table.costs-flat td,#mod-osbl table.costs-flat td{padding:13px 14px;}
   #mod-certificados .c-viaje,#mod-osbl .c-viaje{font-size:16px;}
 
+  /* ── IMPRIMIR CERTIFICADOS ── */
+  .print-btn{font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:.02em;background:transparent;border:1px solid var(--borde);color:var(--texto2);border-radius:20px;padding:5px 13px;cursor:pointer;white-space:nowrap;margin-top:6px;}
+  .print-btn:hover{border-color:var(--naranja);color:var(--naranja);}
+  .print-btn-main{font-family:var(--cond);font-size:13.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;background:var(--gris1);border:1px solid var(--naranja);color:var(--naranja);border-radius:var(--rsm);padding:9px 18px;cursor:pointer;margin-bottom:14px;margin-left:8px;}
+  .print-btn-main:hover{background:var(--naranja);color:#fff;}
+
+  #printSheet{display:none;}
+  @media print {
+    body > *:not(#printSheet){ display:none !important; }
+    #printSheet{ display:block !important; }
+    @page{ size:A4; margin:16mm; }
+  }
+  .ps-page{page-break-after:always;padding:0;font-family:var(--sans);color:#111;}
+  .ps-page:last-child{page-break-after:auto;}
+  .ps-head{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--naranja);padding-bottom:14px;margin-bottom:22px;}
+  .ps-head img{height:44px;}
+  .ps-head-meta{text-align:right;font-family:var(--cond);font-size:11px;color:#666;}
+  .ps-title{font-family:var(--cond);font-weight:800;font-size:24px;color:var(--navy,#161513);margin-bottom:2px;text-transform:uppercase;letter-spacing:.02em;}
+  .ps-sub{font-family:var(--cond);font-size:13px;color:var(--naranja);font-weight:700;margin-bottom:22px;}
+  table.ps-table{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:12.5px;margin-bottom:16px;}
+  table.ps-table th{text-align:left;font-family:var(--cond);text-transform:uppercase;font-size:10px;letter-spacing:.06em;color:#666;font-weight:700;padding:8px 10px;border-bottom:2px solid #ccc;}
+  table.ps-table td{padding:8px 10px;border-bottom:1px solid #e5e5e5;}
+  table.ps-table td.num{text-align:right;}
+  .ps-total-row td{border-top:2px solid var(--naranja);border-bottom:none;font-family:var(--cond);font-weight:800;font-size:14px;padding-top:12px;}
+  .ps-meta-box{background:#f4f4f2;border-radius:6px;padding:12px 16px;margin-bottom:18px;font-family:var(--cond);font-size:12px;color:#444;}
+  .ps-foot{margin-top:30px;padding-top:12px;border-top:1px solid #ddd;font-family:var(--cond);font-size:10px;color:#999;}
+
   /* ── FACTURACIÓN ── */
   .sub-head{font-family:var(--cond);font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;margin:22px 0 10px;color:var(--texto2);}
   table.contrato-tbl{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:13.5px;background:var(--gris1);border:1px solid var(--borde);border-radius:var(--radius);overflow:hidden;}
@@ -231,50 +258,19 @@
 
   <header>
     <div class="eyebrow">Seguimiento de obra</div>
-    <h1>Presencia del equipo en Paraguay</h1>
-    <p class="subt">Calendario de estadías, contrato y cobros del proyecto AlcoEnergy.</p>
+    <h1>Dirección técnica de obra</h1>
+    <p class="subt">Contrato, certificados y calendario de presencia en obra para proyecto AlcoEnergy.</p>
   </header>
 
   <nav class="tabnav" id="tabnav">
-    <button class="tabnav-btn active" data-mod="presencia" onclick="showModule('presencia')">Presencia</button>
-    <button class="tabnav-btn" data-mod="contrato" onclick="showModule('contrato')">Contrato</button>
+    <button class="tabnav-btn active" data-mod="contrato" onclick="showModule('contrato')">Contrato</button>
     <button class="tabnav-btn" data-mod="certificados" onclick="showModule('certificados')">Certificados</button>
     <button class="tabnav-btn" data-mod="osbl" onclick="showModule('osbl')">OSBL</button>
+    <button class="tabnav-btn" data-mod="presencia" onclick="showModule('presencia')">Presencia</button>
   </nav>
 
-  <!-- ═══════════ MÓDULO 1 — PRESENCIA ═══════════ -->
-  <div class="module" id="mod-presencia">
-
-    <section>
-      <div class="sec-head">
-        <h2>Calendario de presencia</h2>
-        <span class="hint">Cada barra es la estadía de una persona. Pasá el mouse para ver el detalle.</span>
-      </div>
-      <div class="legend" id="legend"></div>
-      <div class="gantt-wrap" id="gantt-wrap"><div class="gantt" id="gantt"></div></div>
-    </section>
-
-    <section>
-      <div class="sec-head"><h2>En números</h2></div>
-      <div class="stats" id="stats"></div>
-    </section>
-
-    <section>
-      <div class="sec-head">
-        <h2>Costos por viaje</h2>
-        <span class="hint">Tocá un monto para corregirlo. Tocá el estado para marcar pagado.</span>
-      </div>
-      <div id="newTripBtnWrap"></div>
-      <div class="costos-total-line" id="costosTotalLine"></div>
-      <div class="cost-filter-bar" id="costFilterBar"></div>
-      <div id="trips"></div>
-      <div class="note">Rojo = monto pendiente de confirmar. El estado de pago y las ediciones no quedan guardados al recargar — son para uso en el momento.</div>
-    </section>
-
-  </div>
-
   <!-- ═══════════ MÓDULO 2 — CONTRATO ═══════════ -->
-  <div class="module" id="mod-contrato" style="display:none;">
+  <div class="module" id="mod-contrato">
 
     <section>
       <div class="contrato-letterhead">
@@ -309,6 +305,7 @@
         <span class="hint">Tocá el estado para marcar cobrado.</span>
       </div>
       <div class="big-stats" id="certMensualBigStats"></div>
+      <button class="print-btn-main" onclick="printAllCertificados()">🖨 Imprimir todos los certificados</button>
       <div id="certMensualWrap"></div>
     </section>
 
@@ -336,7 +333,38 @@
 
   </div>
 
-  <footer>INGEMAX S.A. · Herramienta interna de seguimiento de viajes a obra</footer>
+<!-- ═══════════ MÓDULO 1 — PRESENCIA ═══════════ -->
+  <div class="module" id="mod-presencia" style="display:none;">
+
+    <section>
+      <div class="sec-head">
+        <h2>Calendario de presencia</h2>
+        <span class="hint">Cada barra es la estadía de una persona. Pasá el mouse para ver el detalle.</span>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="gantt-wrap" id="gantt-wrap"><div class="gantt" id="gantt"></div></div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>En números</h2></div>
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <section>
+      <div class="sec-head">
+        <h2>Costos por viaje</h2>
+        <span class="hint">Tocá un monto para corregirlo. Tocá el estado para marcar pagado.</span>
+      </div>
+      <div id="newTripBtnWrap"></div>
+      <div class="costos-total-line" id="costosTotalLine"></div>
+      <div class="cost-filter-bar" id="costFilterBar"></div>
+      <div id="trips"></div>
+      <div class="note">Rojo = monto pendiente de confirmar. El estado de pago y las ediciones no quedan guardados al recargar — son para uso en el momento.</div>
+    </section>
+
+  </div>
+
+    <footer>INGEMAX S.A. · Herramienta interna de seguimiento de viajes a obra</footer>
 
   <div class="modal-backdrop" id="newTripModal" style="display:none;">
     <div class="modal-box">
@@ -369,6 +397,8 @@
     </div>
   </div>
 </div>
+
+<div id="printSheet"></div>
 
 <script>
 const EDIT_MODE = new URLSearchParams(location.search).get('edit') === '1';
@@ -736,7 +766,7 @@ function renderCertMensual(){
       : `<span class="estado-badge ${pagado?'estado-ok':'estado-pend'}">${pagado?'✔ Cobrado':'Pendiente'}</span>`;
     group.forEach((r, idx)=>{
       const certCell = idx===0
-        ? `<td class="c-viaje" rowspan="${group.length}">Cert. Nº${certId} — ${r.mes}<span class="c-fechas">Cobro: ${r.fechaCobro||'—'}</span></td>`
+        ? `<td class="c-viaje" rowspan="${group.length}">Cert. Nº${certId} — ${r.mes}<span class="c-fechas">Cobro: ${r.fechaCobro||'—'}</span><br><button class="print-btn" onclick="printCertificado(${certId})">🖨 Imprimir</button></td>`
         : '';
       const estadoTd = idx===0 ? `<td class="num" rowspan="${group.length}">${estadoCell}</td>` : '';
       const totalMesTd = idx===0 ? `<td class="num" rowspan="${group.length}">${fmtUSD(Math.round(r.totalMes))}</td>` : '';
@@ -764,7 +794,7 @@ function renderOsblNota(){
   const bigStats = document.getElementById('osblBigStats');
   if(!CERT_OSBL.length){ el.innerHTML = '<div class="c-empty">Sin certificados OSBL cargados.</div>'; bigStats.innerHTML=''; return; }
 
-  const totalCert = CERT_OSBL.reduce((s,r)=>s+r.honorarioUSD,0);
+  const totalCert = CERT_OSBL.reduce((s,r)=>s+r.montoUSD,0);
   const totalArmando = CERT_OSBL.filter(r=>r.empresa==='Armando Rivas').reduce((s,r)=>s+r.honorarioUSD,0);
   const totalEngesilo = CERT_OSBL.filter(r=>r.empresa==='Engesilo SRL').reduce((s,r)=>s+r.honorarioUSD,0);
   bigStats.innerHTML = `
@@ -856,7 +886,48 @@ window.addEventListener('resize', ()=>{
   }, 150);
 });
 
-// ---------- NUEVO VIAJE (modo edición) ----------
+// ---------- IMPRESIÓN DE CERTIFICADOS ----------
+function buildCertPage_(certId){
+  const group = CERT_MENSUAL.filter(r=>Number(r.certId)===certId);
+  if(!group.length) return '';
+  const head = group[0];
+  const totalMes = head.totalMes;
+  const logoSrc = document.querySelector('.logo-box img')?.getAttribute('src') || '';
+  const rows = group.map(r=>`<tr>
+    <td>${r.descripcion}${r.observaciones?` — <i>${r.observaciones}</i>`:''}</td>
+    <td class="num">${r.cantidad}</td>
+    <td class="num">${fmtUSD(Math.round(r.precio))}</td>
+    <td class="num">${fmtUSD(Math.round(r.total))}</td>
+  </tr>`).join('');
+  return `<div class="ps-page">
+    <div class="ps-head">
+      <img src="${logoSrc}" alt="INGEMAX S.A.">
+      <div class="ps-head-meta">AlcoEnergy — Planta Industrial de Etanol<br>Coronel Oviedo, Paraguay</div>
+    </div>
+    <div class="ps-title">Certificado de cobro Nº ${certId}</div>
+    <div class="ps-sub">${head.mes} · Ítem C + Ítem D + Viáticos</div>
+    <div class="ps-meta-box">Estado: <b>${head.estado}</b> &nbsp;·&nbsp; Fecha de cobro: <b>${head.fechaCobro||'—'}</b></div>
+    <table class="ps-table">
+      <thead><tr><th>Concepto</th><th>Cantidad</th><th>Precio</th><th>Total</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr class="ps-total-row"><td colspan="3">TOTAL DEL CERTIFICADO</td><td class="num">${fmtUSD(Math.round(totalMes))}</td></tr></tfoot>
+    </table>
+    <div class="ps-foot">INGEMAX S.A. · Dirección Técnica de Obra · AlcoEnergy — Planta Industrial de Etanol</div>
+  </div>`;
+}
+
+function printCertificado(certId){
+  document.getElementById('printSheet').innerHTML = buildCertPage_(certId);
+  window.print();
+}
+
+function printAllCertificados(){
+  const certIds = [...new Set(CERT_MENSUAL.map(r=>Number(r.certId)))];
+  document.getElementById('printSheet').innerHTML = certIds.map(id=>buildCertPage_(id)).join('');
+  window.print();
+}
+
+
 function openNewTripModal(){
   document.getElementById('ntNombre').value = '';
   document.getElementById('ntDesde').value = '';
