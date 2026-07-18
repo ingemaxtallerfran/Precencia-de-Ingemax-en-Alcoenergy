@@ -42,6 +42,19 @@
   .brand-right{display:flex;align-items:center;gap:12px;}
   .cronograma-link{font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--texto2);text-decoration:none;border:1px solid var(--borde);border-radius:20px;padding:7px 14px;transition:all .15s;}
   .cronograma-link:hover{border-color:var(--naranja);color:var(--naranja);}
+
+  /* ── ACCESO PROTEGIDO ── */
+  .auth-gate{position:fixed;inset:0;background:var(--papel);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .auth-box{background:var(--gris1);border:1px solid var(--borde);border-radius:var(--radius);padding:36px 32px;max-width:360px;width:100%;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.08);}
+  .auth-box .logo-box{margin:0 auto 18px;height:44px;width:fit-content;}
+  .auth-box .logo-box img{height:100%;}
+  .auth-box h2{font-family:var(--cond);font-size:20px;font-weight:800;color:var(--texto);margin-bottom:8px;}
+  .auth-box p{font-family:var(--sans);font-size:13px;color:var(--texto2);margin-bottom:20px;line-height:1.4;}
+  .auth-box input{width:100%;padding:11px 14px;border:1px solid var(--borde);border-radius:var(--rsm);font-family:var(--sans);font-size:15px;margin-bottom:12px;outline:none;text-align:center;}
+  .auth-box input:focus{border-color:var(--naranja);}
+  .auth-box button{width:100%;background:var(--naranja);color:#fff;border:none;padding:11px;border-radius:var(--rsm);font-family:var(--cond);font-size:14px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;}
+  .auth-box button:hover{opacity:.9;}
+  .auth-error{color:var(--rojo);font-family:var(--cond);font-size:12.5px;margin-top:10px;min-height:16px;}
   .edit-badge{font-family:var(--cond);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;background:var(--naranja);color:#fff;padding:4px 10px;border-radius:20px;}
 
   /* ── HEADER ── */
@@ -249,7 +262,19 @@
 </style>
 </head>
 <body>
-<div class="root">
+<div id="authGate" class="auth-gate">
+  <div class="auth-box">
+    <div class="logo-box" id="authLogoBox"></div>
+    <h2>Acceso protegido</h2>
+    <p>Esta página es de uso interno de INGEMAX S.A. para el proyecto AlcoEnergy.</p>
+    <input type="password" id="authInput" placeholder="Contraseña" autocomplete="off">
+    <button onclick="checkAuth()">Ingresar</button>
+    <div id="authError" class="auth-error"></div>
+  </div>
+</div>
+
+<div class="root" id="appRoot" style="display:none;">
+
 
   <div class="brandbar">
     <div class="brand-left">
@@ -407,6 +432,41 @@
 <div id="printSheet"></div>
 
 <script>
+const APP_PASSWORD = 'Proyecto2026';
+
+function checkAuth(){
+  const input = document.getElementById('authInput');
+  const err = document.getElementById('authError');
+  if(input.value === APP_PASSWORD){
+    sessionStorage.setItem('ingemax_auth', 'ok');
+    unlockApp();
+  } else {
+    err.textContent = 'Contraseña incorrecta.';
+    input.value = '';
+    input.focus();
+  }
+}
+
+function unlockApp(){
+  document.getElementById('authGate').style.display = 'none';
+  document.getElementById('appRoot').style.display = 'block';
+  loadData();
+}
+
+// clonar el logo ya cargado (base64) dentro del cartel de acceso, sin duplicarlo en el HTML
+document.addEventListener('DOMContentLoaded', ()=>{
+  const srcImg = document.querySelector('.brandbar .logo-box img');
+  if(srcImg){
+    document.getElementById('authLogoBox').innerHTML = `<img src="${srcImg.getAttribute('src')}" alt="INGEMAX S.A.">`;
+  }
+  if(sessionStorage.getItem('ingemax_auth') === 'ok'){
+    unlockApp();
+  } else {
+    document.getElementById('authInput').addEventListener('keydown', e=>{ if(e.key==='Enter') checkAuth(); });
+    document.getElementById('authInput').focus();
+  }
+});
+
 const EDIT_MODE = new URLSearchParams(location.search).get('edit') === '1';
 if(EDIT_MODE) document.body.classList.add('edit-mode');
 const RATE = 1400; // ARS por USD, aproximado
@@ -883,7 +943,6 @@ function renderAll(){
   document.getElementById('editBadgeWrap').innerHTML = EDIT_MODE ? `<span class="edit-badge">Modo edición</span>` : '';
   document.getElementById('newTripBtnWrap').innerHTML = EDIT_MODE ? `<button class="new-trip-btn" onclick="openNewTripModal()">+ Nuevo viaje</button>` : '';
 }
-loadData();
 let _resizeTimer;
 window.addEventListener('resize', ()=>{
   clearTimeout(_resizeTimer);
