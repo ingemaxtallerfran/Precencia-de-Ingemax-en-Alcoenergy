@@ -123,6 +123,20 @@
 
   footer{padding:20px 0;color:var(--gris5);font-family:var(--cond);font-size:11px;border-top:1px solid var(--borde);margin-top:14px;letter-spacing:.03em;}
 
+  /* ── FACTURACIÓN ── */
+  .sub-head{font-family:var(--cond);font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;margin:22px 0 10px;color:var(--texto2);}
+  table.contrato-tbl{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:13.5px;background:var(--gris1);border:1px solid var(--borde);border-radius:var(--radius);overflow:hidden;}
+  table.contrato-tbl th{text-align:left;font-family:var(--cond);text-transform:uppercase;font-size:11px;letter-spacing:.06em;color:var(--gris5);font-weight:700;padding:9px 11px;border:1px solid var(--borde);background:var(--gris2);}
+  table.contrato-tbl td{padding:9px 11px;border:1px solid var(--gris3);vertical-align:top;}
+  table.contrato-tbl .ct-item{font-family:var(--cond);font-weight:800;font-size:15px;text-align:center;background:var(--gris2);}
+  .estado-badge.estado-facturado{color:#fff;background:var(--gris5);border:1px solid var(--gris5);}
+  .osbl-mes-card{background:var(--gris1);border:1px solid var(--borde);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;}
+  .osbl-mes-card .om-head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--borde);padding-bottom:8px;margin-bottom:8px;}
+  .osbl-mes-card .om-mes{font-family:var(--cond);font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.02em;}
+  .osbl-mes-card .om-total{font-family:var(--cond);font-weight:800;font-size:15px;color:var(--naranja);}
+  .osbl-mes-card .om-row{display:flex;justify-content:space-between;font-family:var(--sans);font-size:13.5px;padding:4px 0;color:var(--texto2);}
+  .osbl-mes-card .om-row b{color:var(--texto);font-weight:600;}
+
   /* ── NUEVO VIAJE ── */
   .new-trip-btn{font-family:var(--cond);font-size:13.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;background:var(--naranja);border:none;color:#fff;padding:9px 18px;border-radius:var(--rsm);cursor:pointer;margin-bottom:14px;}
   .new-trip-btn:hover{opacity:.9;}
@@ -204,6 +218,26 @@
     <div class="note">Rojo = monto pendiente de confirmar. El estado de pago y las ediciones no quedan guardados al recargar — son para uso en el momento.</div>
   </section>
 
+  <section>
+    <div class="sec-head">
+      <h2>Facturación</h2>
+      <span class="hint">Contrato de referencia, cobro mensual consolidado y detalle de certificados OSBL.</span>
+    </div>
+
+    <h3 class="sub-head">Contrato (referencia fija)</h3>
+    <div id="contratoWrap"></div>
+
+    <h3 class="sub-head">Cobro mensual (Ítem C + Ítem D + viáticos)</h3>
+    <div class="costos-total-line" id="certMensualTotalLine"></div>
+    <div id="certMensualWrap"></div>
+
+    <h3 class="sub-head">Nota de honorarios OSBL a facturar a AlcoEnergy, por mes</h3>
+    <div id="osblNotaWrap"></div>
+
+    <h3 class="sub-head">Detalle de certificados OSBL por subcontratista</h3>
+    <div id="certOsblWrap"></div>
+  </section>
+
   <footer>INGEMAX S.A. · Herramienta interna de seguimiento de viajes a obra</footer>
 
   <div class="modal-backdrop" id="newTripModal" style="display:none;">
@@ -249,6 +283,9 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycby4TmKAYjTAjvUPGJYvRMVC
 let PEOPLE = {};
 let TRIPS = [];
 let STAYS = [];
+let CONTRATO = [];
+let CERT_MENSUAL = [];
+let CERT_OSBL = [];
 
 // ---------- JSONP helper (mismo patrón que tus otras apps) ----------
 let _jsonpCounter = 0;
@@ -278,6 +315,9 @@ async function loadData(){
     PEOPLE = data.people;
     TRIPS = data.trips;
     STAYS = data.stays;
+    CONTRATO = data.contrato || [];
+    CERT_MENSUAL = data.certMensual || [];
+    CERT_OSBL = data.certOsbl || [];
     renderAll();
   }catch(err){
     wrap.innerHTML = '<div style="padding:20px;font-family:var(--cond);color:var(--rojo);">No se pudo conectar con la planilla. Revisá que GAS_URL esté bien pegada y que el deploy sea "Cualquiera" con acceso. Detalle: '+err.message+'</div>';
@@ -521,10 +561,161 @@ async function togglePagado(btn){
   }
 }
 
+// ---------- FACTURACIÓN: Contrato (solo lectura) ----------
+function renderContrato(){
+  const el = document.getElementById('contratoWrap');
+  if(!CONTRATO.length){ el.innerHTML = '<div class="c-empty">Sin datos de contrato cargados.</div>'; return; }
+  const rows = CONTRATO.map(c => `<tr>
+    <td class="ct-item">${c.item}</td>
+    <td>${c.descripcion}</td>
+    <td>${c.unidad}</td>
+    <td>${c.precio}</td>
+    <td>${c.formaPago}</td>
+    <td>${c.cobrado}</td>
+  </tr>`).join('');
+  el.innerHTML = `<table class="contrato-tbl">
+    <thead><tr><th>Ítem</th><th>Descripción</th><th>Unidad</th><th>Precio</th><th>Forma de pago</th><th>Cobrado</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// ---------- FACTURACIÓN: Cobro mensual ----------
+async function toggleCertMensual(certId, btn){
+  btn.disabled = true;
+  try{
+    const res = await jsonp({ action:'toggleCertMensualEstado', certId });
+    if(!res.ok) throw new Error(res.error||'Error desconocido');
+    CERT_MENSUAL.forEach(r=>{ if(Number(r.certId)===certId) r.estado = res.estado; });
+    renderCertMensual();
+  }catch(err){
+    alert('No se pudo actualizar el estado: ' + err.message);
+    btn.disabled = false;
+  }
+}
+
+function renderCertMensual(){
+  const el = document.getElementById('certMensualWrap');
+  const totalLine = document.getElementById('certMensualTotalLine');
+  if(!CERT_MENSUAL.length){ el.innerHTML = '<div class="c-empty">Sin certificados cargados.</div>'; totalLine.innerHTML=''; return; }
+
+  const certIds = [...new Set(CERT_MENSUAL.map(r=>Number(r.certId)))];
+  const totalFacturado = certIds.reduce((s,id)=>{
+    const r = CERT_MENSUAL.find(x=>Number(x.certId)===id);
+    return s + (r ? r.totalMes : 0);
+  }, 0);
+  const totalCobrado = certIds.reduce((s,id)=>{
+    const r = CERT_MENSUAL.find(x=>Number(x.certId)===id);
+    return s + (r && r.estado==='Cobrado' ? r.totalMes : 0);
+  }, 0);
+  totalLine.innerHTML = `Facturado a la fecha: <b>${fmtUSD(Math.round(totalFacturado))}</b> · Cobrado: <b>${fmtUSD(Math.round(totalCobrado))}</b> · Pendiente: <b>${fmtUSD(Math.round(totalFacturado-totalCobrado))}</b>`;
+
+  let rowsHtml = '';
+  certIds.forEach(certId=>{
+    const group = CERT_MENSUAL.filter(r=>Number(r.certId)===certId);
+    const head = group[0];
+    const pagado = head.estado === 'Cobrado';
+    const estadoCell = EDIT_MODE
+      ? `<button class="estado-btn ${pagado?'estado-ok':'estado-pend'}" onclick="toggleCertMensual(${certId}, this)">${pagado?'✔ Cobrado':'Pendiente'}</button>`
+      : `<span class="estado-badge ${pagado?'estado-ok':'estado-pend'}">${pagado?'✔ Cobrado':'Pendiente'}</span>`;
+    group.forEach((r, idx)=>{
+      const certCell = idx===0
+        ? `<td class="c-viaje" rowspan="${group.length}">Cert. Nº${certId} — ${r.mes}<span class="c-fechas">Cobro: ${r.fechaCobro||'—'}</span></td>`
+        : '';
+      const estadoTd = idx===0 ? `<td class="num" rowspan="${group.length}">${estadoCell}</td>` : '';
+      const totalMesTd = idx===0 ? `<td class="num" rowspan="${group.length}">${fmtUSD(Math.round(r.totalMes))}</td>` : '';
+      rowsHtml += `<tr class="${idx===0?'group-start':''}">
+        ${certCell}
+        <td>${r.descripcion}${r.observaciones?`<span class="c-fechas" style="color:var(--gris5);">${r.observaciones}</span>`:''}</td>
+        <td class="num">${r.cantidad}</td>
+        <td class="num">${fmtUSD(Math.round(r.precio))}</td>
+        <td class="num">${fmtUSD(Math.round(r.total))}</td>
+        ${totalMesTd}
+        ${estadoTd}
+      </tr>`;
+    });
+  });
+
+  el.innerHTML = `<div class="costs-table-wrap"><table class="costs-flat">
+    <thead><tr><th>Certificado</th><th>Concepto</th><th>Cant.</th><th>Precio</th><th>Total línea</th><th>Total mes</th><th>Estado</th></tr></thead>
+    <tbody>${rowsHtml}</tbody>
+  </table></div>`;
+}
+
+// ---------- FACTURACIÓN: Nota mensual OSBL (calculada) ----------
+function renderOsblNota(){
+  const el = document.getElementById('osblNotaWrap');
+  if(!CERT_OSBL.length){ el.innerHTML = '<div class="c-empty">Sin certificados OSBL cargados.</div>'; return; }
+  const meses = [...new Set(CERT_OSBL.map(r=>r.mesFacturacion))].sort();
+  el.innerHTML = meses.map(mes=>{
+    const items = CERT_OSBL.filter(r=>r.mesFacturacion===mes);
+    const total = items.reduce((s,r)=>s+r.honorarioUSD,0);
+    const rows = items.map(r=>`<div class="om-row"><span>${r.empresa} — ${r.obra} (Cert. Nº${r.nCert})</span><b>${fmtUSD(Math.round(r.honorarioUSD))}</b></div>`).join('');
+    return `<div class="osbl-mes-card">
+      <div class="om-head"><span class="om-mes">Facturación ${mes}</span><span class="om-total">${fmtUSD(Math.round(total))}</span></div>
+      ${rows}
+    </div>`;
+  }).join('');
+}
+
+// ---------- FACTURACIÓN: Detalle certificados OSBL ----------
+async function toggleCertOsbl(rowIndex, btn){
+  btn.disabled = true;
+  try{
+    const res = await jsonp({ action:'toggleCertOsblEstado', rowIndex });
+    if(!res.ok) throw new Error(res.error||'Error desconocido');
+    CERT_OSBL[rowIndex].estado = res.estado;
+    renderCertOsbl();
+  }catch(err){
+    alert('No se pudo actualizar el estado: ' + err.message);
+    btn.disabled = false;
+  }
+}
+
+function renderCertOsbl(){
+  const el = document.getElementById('certOsblWrap');
+  if(!CERT_OSBL.length){ el.innerHTML = '<div class="c-empty">Sin certificados OSBL cargados.</div>'; return; }
+
+  const empresas = [...new Set(CERT_OSBL.map(r=>r.empresa))];
+  let rowsHtml = '';
+  empresas.forEach(empresa=>{
+    const group = CERT_OSBL.map((r,idx)=>({r,idx})).filter(x=>x.r.empresa===empresa);
+    group.forEach(({r,idx}, i)=>{
+      const facturado = r.estado === 'Facturado';
+      const estadoCell = EDIT_MODE
+        ? `<button class="estado-btn ${facturado?'estado-ok':'estado-pend'}" onclick="toggleCertOsbl(${idx}, this)">${facturado?'✔ Facturado':'Pendiente'}</button>`
+        : `<span class="estado-badge ${facturado?'estado-facturado':'estado-pend'}">${facturado?'Facturado':'Pendiente'}</span>`;
+      const empresaCell = i===0
+        ? `<td class="c-viaje" rowspan="${group.length}">${empresa}</td>`
+        : '';
+      rowsHtml += `<tr class="${i===0?'group-start':''}">
+        ${empresaCell}
+        <td>${r.obra}<span class="c-fechas">Período: ${r.periodo}</span></td>
+        <td class="num">${r.nCert}</td>
+        <td class="num">${r.moneda} ${r.montoOriginal.toLocaleString('es-AR')}</td>
+        <td class="num">${fmtUSD(Math.round(r.montoUSD))}</td>
+        <td class="num">${(r.pctHonorario*100).toFixed(1)}%</td>
+        <td class="num">${fmtUSD(Math.round(r.honorarioUSD))}</td>
+        <td class="num">${r.mesFacturacion}</td>
+        <td class="num">${estadoCell}</td>
+      </tr>`;
+    });
+  });
+
+  el.innerHTML = `<div class="costs-table-wrap"><table class="costs-flat">
+    <thead><tr><th>Empresa</th><th>Obra / Rubro</th><th>N° Cert.</th><th>Monto original</th><th>Monto USD</th><th>%</th><th>Honorario USD</th><th>Mes fact.</th><th>Estado</th></tr></thead>
+    <tbody>${rowsHtml}</tbody>
+  </table></div>`;
+}
+
+
 function renderAll(){
   renderGantt();
   renderStats();
   renderTrips();
+  renderContrato();
+  renderCertMensual();
+  renderOsblNota();
+  renderCertOsbl();
   document.getElementById('editBadgeWrap').innerHTML = EDIT_MODE ? `<span class="edit-badge">Modo edición</span>` : '';
   document.getElementById('newTripBtnWrap').innerHTML = EDIT_MODE ? `<button class="new-trip-btn" onclick="openNewTripModal()">+ Nuevo viaje</button>` : '';
 }
