@@ -542,6 +542,12 @@ function toUSD(amount, cur){ return cur==='ARS' ? amount/RATE : amount; }
 function fmtUSD(n){ return 'USD ' + n.toLocaleString('es-AR',{maximumFractionDigits:0}); }
 function dayDiff(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); }
 function fmtDate(d){ const dt=new Date(d+'T00:00:00'); return dt.toLocaleDateString('es-AR',{day:'2-digit',month:'short'}); }
+function fmtFechaLarga(d){
+  if(!d) return '—';
+  const dt = new Date(d+'T00:00:00');
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  return `${dt.getDate()} de ${meses[dt.getMonth()]} ${dt.getFullYear()}`;
+}
 function tripById(id){ return TRIPS.find(t=>t.id===id); }
 
 // ---------- edición por doble click ----------
@@ -929,12 +935,13 @@ function renderCertOsbl(){
         <td class="num">${fmtUSD(Math.round(r.honorarioUSD))}</td>
         <td class="num">${r.mesFacturacion}</td>
         <td class="num">${estadoCell}</td>
+        <td class="num"><button class="print-btn" onclick="printCertOsbl(${idx})">🖨 Descargar</button></td>
       </tr>`;
     });
   });
 
   el.innerHTML = `<div class="costs-table-wrap"><table class="costs-flat">
-    <thead><tr><th>Empresa</th><th>Obra / Rubro</th><th>N° Cert.</th><th>Monto original</th><th>Monto USD</th><th>%</th><th>Honorario USD</th><th>Mes de cobro</th><th>Estado</th></tr></thead>
+    <thead><tr><th>Empresa</th><th>Obra / Rubro</th><th>N° Cert.</th><th>Monto original</th><th>Monto USD</th><th>%</th><th>Honorario USD</th><th>Mes de cobro</th><th>Estado</th><th>Certificado</th></tr></thead>
     <tbody>${rowsHtml}</tbody>
   </table></div>`;
 }
@@ -979,7 +986,7 @@ function buildCertPage_(certId){
     </div>
     <div class="ps-title">Certificado de cobro Nº ${certId}</div>
     <div class="ps-sub">${head.mes}</div>
-    <div class="ps-meta-box">Estado: <b>${head.estado}</b> &nbsp;·&nbsp; Fecha de cobro: <b>${head.fechaCobro||'—'}</b></div>
+    <div class="ps-meta-box">Estado: <b>${head.estado}</b> &nbsp;·&nbsp; Fecha de cobro: <b>${fmtFechaLarga(head.fechaCobro)}</b>${head.periodoItemC ? ` &nbsp;·&nbsp; Período Ítem C: <b>${head.periodoItemC}</b>` : ''}</div>
     <table class="ps-table">
       <thead><tr><th>Concepto</th><th>Cantidad</th><th>Precio</th><th>Total</th></tr></thead>
       <tbody>${rows}</tbody>
@@ -991,6 +998,37 @@ function buildCertPage_(certId){
 
 function printCertificado(certId){
   document.getElementById('printSheet').innerHTML = buildCertPage_(certId);
+  window.print();
+}
+
+function buildCertOsblPage_(rowIndex){
+  const r = CERT_OSBL[rowIndex];
+  if(!r) return '';
+  const logoSrc = document.querySelector('.logo-box img')?.getAttribute('src') || '';
+  return `<div class="ps-page">
+    <div class="ps-head">
+      <img src="${logoSrc}" alt="INGEMAX S.A.">
+      <div class="ps-head-meta">AlcoEnergy — Planta Industrial de Etanol<br>Coronel Oviedo, Paraguay</div>
+    </div>
+    <div class="ps-title">Certificado OSBL — ${r.empresa}</div>
+    <div class="ps-sub">${r.obra} · Nº ${r.nCert}</div>
+    <div class="ps-meta-box">Estado: <b>${r.estado}</b> &nbsp;·&nbsp; Período: <b>${r.periodo}</b> &nbsp;·&nbsp; Mes de cobro: <b>${r.mesFacturacion}</b></div>
+    <table class="ps-table">
+      <thead><tr><th>Concepto</th><th>Valor</th></tr></thead>
+      <tbody>
+        <tr><td>Monto original certificado</td><td class="num">${r.moneda} ${r.montoOriginal.toLocaleString('es-AR')}</td></tr>
+        <tr><td>Tipo de cambio</td><td class="num">${r.tc}</td></tr>
+        <tr><td>Monto en USD</td><td class="num">${fmtUSD(Math.round(r.montoUSD))}</td></tr>
+        <tr><td>Porcentaje de honorario</td><td class="num">${(r.pctHonorario*100).toFixed(1)}%</td></tr>
+      </tbody>
+      <tfoot><tr class="ps-total-row"><td>HONORARIO A COBRAR</td><td class="num">${fmtUSD(Math.round(r.honorarioUSD))}</td></tr></tfoot>
+    </table>
+    <div class="ps-foot">INGEMAX S.A. · Dirección Técnica de Obra · AlcoEnergy — Planta Industrial de Etanol</div>
+  </div>`;
+}
+
+function printCertOsbl(rowIndex){
+  document.getElementById('printSheet').innerHTML = buildCertOsblPage_(rowIndex);
   window.print();
 }
 
