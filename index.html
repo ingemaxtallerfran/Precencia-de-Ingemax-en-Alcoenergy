@@ -105,13 +105,16 @@
   .costos-total-line{font-family:var(--cond);font-size:14.5px;color:var(--texto2);margin-bottom:14px;padding:11px 14px;background:var(--gris2);border-radius:var(--rsm);}
   .costos-total-line b{color:var(--texto);font-weight:900;}
 
-  .cost-filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .cost-filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
   .cost-filter-bar button{
-    font-family:var(--cond);font-size:12.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
-    border:1px solid var(--borde);border-radius:20px;padding:6px 14px;cursor:pointer;background:var(--gris1);color:var(--texto2);
+    font-family:var(--cond);font-size:15px;font-weight:900;letter-spacing:.03em;text-transform:uppercase;
+    border:2px solid var(--borde);border-radius:24px;padding:11px 22px;cursor:pointer;background:var(--gris1);color:var(--texto2);
+    box-shadow:0 1px 3px rgba(0,0,0,.06);transition:all .15s;
   }
-  .cost-filter-bar button.active{background:var(--naranja);border-color:var(--naranja);color:#fff;}
-  .cost-filter-bar .fcount{opacity:.75;margin-left:3px;}
+  .cost-filter-bar button:hover{border-color:var(--naranja);}
+  .cost-filter-bar button.active{background:var(--naranja);border-color:var(--naranja);color:#fff;box-shadow:0 2px 6px rgba(217,84,10,.35);}
+  .cost-filter-bar .fcount{opacity:.85;margin-left:5px;background:rgba(0,0,0,.08);border-radius:12px;padding:2px 9px;}
+  .cost-filter-bar button.active .fcount{background:rgba(255,255,255,.25);}
 
   .costs-table-wrap{background:var(--gris1);border:1px solid var(--borde);border-radius:var(--radius);overflow:auto;}
   table.costs-flat{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:14.5px;}
@@ -333,9 +336,7 @@
     <section>
       <div class="sec-head">
         <h2>Certificados de cobro mensual</h2>
-        <span class="hint">Tocá el estado para marcar cobrado.</span>
       </div>
-      <div class="big-stats" id="certMensualBigStats"></div>
       <button class="print-btn-main" onclick="printAllCertificados()">🖨 Imprimir todos los certificados</button>
       <div id="certMensualWrap"></div>
     </section>
@@ -347,18 +348,7 @@
 
     <section>
       <div class="sec-head">
-        <h2>Totales certificados OSBL</h2>
-        <span class="hint">Calculada automáticamente a partir del detalle de certificados, agrupada por mes.</span>
-      </div>
-      <div class="big-stats" id="osblBigStats"></div>
-      <h3 class="sub-head">Honorarios</h3>
-      <div id="osblNotaWrap"></div>
-    </section>
-
-    <section>
-      <div class="sec-head">
         <h2>Certificados OSBL por subcontratista</h2>
-        <span class="hint">Tocá el estado para marcar cobrado.</span>
       </div>
       <div id="certOsblWrap"></div>
     </section>
@@ -378,19 +368,13 @@
     </section>
 
     <section>
-      <div class="sec-head"><h2>En números</h2></div>
-      <div class="stats" id="stats"></div>
-    </section>
-
-    <section>
       <div class="sec-head">
         <h2>Costos por viaje</h2>
-        <span class="hint">Tocá un monto para corregirlo. Tocá el estado para marcar pagado.</span>
       </div>
       <div id="newTripBtnWrap"></div>
-      <div class="costos-total-line" id="costosTotalLine"></div>
       <div class="cost-filter-bar" id="costFilterBar"></div>
       <div id="trips"></div>
+      <div class="costos-total-line" id="costosTotalLine"></div>
       <div class="note">Rojo = monto pendiente de confirmar. El estado de pago y las ediciones no quedan guardados al recargar — son para uso en el momento.</div>
     </section>
 
@@ -706,7 +690,7 @@ function renderTrips(){
   const filtroBar = document.getElementById('costFilterBar');
   const counts = { todos: allItems.length, pendiente: allItems.filter(i=>!i.pagado).length, pagado: allItems.filter(i=>i.pagado).length };
   filtroBar.innerHTML = ['todos','pendiente','pagado'].map(f=>{
-    const label = f==='todos'?'Todos':f==='pendiente'?'Pendiente':'Pagados';
+    const label = f==='todos'?'📋 Todos':f==='pendiente'?'⏳ Pendiente':'✅ Pagados';
     return `<button class="${f===costFilter?'active':''}" onclick="setCostFilter('${f}')">${label} <span class="fcount">${counts[f]}</span></button>`;
   }).join('');
 
@@ -818,23 +802,9 @@ async function toggleCertMensual(certId, btn){
 
 function renderCertMensual(){
   const el = document.getElementById('certMensualWrap');
-  const bigStats = document.getElementById('certMensualBigStats');
-  if(!CERT_MENSUAL.length){ el.innerHTML = '<div class="c-empty">Sin certificados cargados.</div>'; bigStats.innerHTML=''; return; }
+  if(!CERT_MENSUAL.length){ el.innerHTML = '<div class="c-empty">Sin certificados cargados.</div>'; return; }
 
   const certIds = [...new Set(CERT_MENSUAL.map(r=>Number(r.certId)))];
-  const totalFacturado = certIds.reduce((s,id)=>{
-    const r = CERT_MENSUAL.find(x=>Number(x.certId)===id);
-    return s + (r ? r.totalMes : 0);
-  }, 0);
-  const totalCobrado = certIds.reduce((s,id)=>{
-    const r = CERT_MENSUAL.find(x=>Number(x.certId)===id);
-    return s + (r && r.estado==='Cobrado' ? r.totalMes : 0);
-  }, 0);
-  bigStats.innerHTML = `
-    <div class="big-stat bs-total"><div class="bs-n">${fmtUSD(Math.round(totalFacturado))}</div><div class="bs-l">Total a cobrar</div></div>
-    <div class="big-stat bs-cobrado"><div class="bs-n">${fmtUSD(Math.round(totalCobrado))}</div><div class="bs-l">Cobrado</div></div>
-    <div class="big-stat bs-pendiente"><div class="bs-n">${fmtUSD(Math.round(totalFacturado-totalCobrado))}</div><div class="bs-l">Pendiente de cobro</div></div>
-  `;
 
   let rowsHtml = '';
   certIds.forEach(certId=>{
@@ -954,11 +924,11 @@ function renderCertOsbl(){
 
 function renderAll(){
   renderGantt();
-  renderStats();
+  // renderStats() ya no se usa — se sacó la sección "En números" por simplicidad
   renderTrips();
   renderContrato();
   renderCertMensual();
-  renderOsblNota();
+  // renderOsblNota() ya no se usa — la sección de honorarios se sacó por simplicidad
   renderCertOsbl();
   document.getElementById('editBadgeWrap').innerHTML = EDIT_MODE ? `<span class="edit-badge">Modo edición</span>` : '';
   document.getElementById('newTripBtnWrap').innerHTML = EDIT_MODE ? `<button class="new-trip-btn" onclick="openNewTripModal()">+ Nuevo viaje</button>` : '';
