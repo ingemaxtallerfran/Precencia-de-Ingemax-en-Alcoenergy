@@ -258,9 +258,85 @@
   .btn-save{background:var(--naranja);border:none;color:#fff;padding:10px 20px;border-radius:var(--rsm);font-family:var(--cond);font-size:14px;font-weight:900;cursor:pointer;letter-spacing:.03em;text-transform:uppercase;}
 
   @media (max-width:768px){
-    .gantt-ruler .rl,.gantt-row .rl{min-width:130px;flex:0 0 130px;}
+    .root{padding:0 14px 40px;}
+
+    /* brandbar */
+    .brandbar{padding:10px 0;gap:8px;}
+    .logo-box{height:32px;padding:5px 8px;}
+    .brand-tag{display:none;}
+    .brand-right{gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+    .cronograma-link{font-size:11px;padding:6px 10px;}
+    .edit-badge{font-size:9px;padding:3px 8px;}
+
+    /* header */
+    .eyebrow{font-size:10px;}
     h1{font-size:22px;}
-    .stat{min-width:120px;}
+    .subt{font-size:13px;}
+
+    /* pestañas: scroll horizontal en vez de wrap apretado */
+    .tabnav{overflow-x:auto;-webkit-overflow-scrolling:touch;gap:2px;flex-wrap:nowrap;margin-bottom:18px;}
+    .tabnav-btn{font-size:12.5px;padding:10px 12px;white-space:nowrap;flex-shrink:0;}
+
+    .sec-head{gap:4px;}
+    .sec-head h2{font-size:18px;}
+    .sub-head{font-size:14px;}
+
+    /* calendario: columna de nombre más angosta, texto más chico */
+    .gantt-ruler .rl,.gantt-row .rl{min-width:104px;flex:0 0 104px;padding:8px 8px;}
+    .rl .name{font-size:13px;}
+    .rl .days{font-size:10px;}
+    .gantt-bar{font-size:11px;padding:0 7px;height:32px;top:9px;}
+    .gantt-bar small{display:none;} /* en mobile ocultamos el nombre del viaje dentro de la barra, muy angosta */
+    .legend{font-size:11px;gap:10px;}
+    .legend i{width:10px;height:10px;}
+
+    /* botones de filtro: más chicos para que entren en una fila */
+    .cost-filter-bar{gap:6px;}
+    .cost-filter-bar button{font-size:12px;padding:8px 14px;border-width:1.5px;}
+
+    /* tablas: achicar tipografía, el scroll horizontal ya está resuelto por costs-table-wrap */
+    table.costs-flat{font-size:12px;}
+    table.costs-flat th{font-size:9.5px;padding:8px 8px;}
+    table.costs-flat td{padding:8px 8px;}
+    #mod-certificados table.costs-flat,#mod-osbl table.costs-flat{font-size:12.5px;}
+    #mod-certificados table.costs-flat th,#mod-osbl table.costs-flat th{font-size:10px;padding:9px 8px;}
+    #mod-certificados table.costs-flat td,#mod-osbl table.costs-flat td{padding:9px 8px;}
+    .c-viaje{font-size:12px;white-space:normal;}
+    #mod-certificados .c-viaje,#mod-osbl .c-viaje{font-size:13px;}
+    .c-fechas{font-size:10px;}
+    .costs-table-wrap{-webkit-overflow-scrolling:touch;}
+    .costs-table-wrap::after{content:'◀ deslizá para ver más ▶';display:block;text-align:center;font-family:var(--cond);font-size:10px;color:var(--gris5);padding:6px;border-top:1px solid var(--borde);}
+
+    /* botones de acción: ocupan todo el ancho, más fáciles de tocar */
+    .new-trip-btn,.print-btn-main{width:100%;margin-left:0;padding:12px;font-size:13px;}
+    .print-btn{padding:7px 12px;font-size:11px;}
+    .estado-btn,.estado-badge{font-size:11px;padding:5px 10px;}
+
+    /* contrato: apilar logos y achicar */
+    .contrato-letterhead{padding:18px 16px;}
+    .cl-logos{flex-direction:column;align-items:flex-start;gap:10px;}
+    .cl-alcoenergy{font-size:18px;}
+    .cl-title h2{font-size:19px;}
+    .cl-eyebrow{font-size:10.5px;}
+    .cl-meta{font-size:12.5px;line-height:1.7;}
+    .cl-download{width:100%;text-align:center;box-sizing:border-box;}
+
+    /* modal nuevo viaje: pantalla completa, más fácil en celular */
+    .modal-backdrop{padding:0;align-items:flex-end;}
+    .modal-box{max-width:none;border-radius:14px 14px 0 0;max-height:92vh;overflow-y:auto;padding:18px 16px 26px;}
+    .form-row-2{flex-direction:column;gap:0;}
+    .nt-item-row{flex-wrap:wrap;}
+    .nt-item-row input[type=text]{flex:1 1 100%;}
+
+    /* auth gate */
+    .auth-box{padding:28px 22px;}
+  }
+
+  @media (max-width:420px){
+    .gantt-ruler .rl,.gantt-row .rl{min-width:86px;flex:0 0 86px;}
+    .rl .name{font-size:12px;}
+    .tabnav-btn{font-size:11.5px;padding:9px 10px;}
+    .cost-filter-bar button{font-size:11px;padding:7px 11px;}
   }
 </style>
 </head>
