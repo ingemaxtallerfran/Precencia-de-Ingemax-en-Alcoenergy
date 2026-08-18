@@ -122,6 +122,8 @@
   table.costs-flat td{padding:10px 12px;border:1px solid var(--gris3);vertical-align:top;}
   table.costs-flat tr:hover td{background:var(--naranja-dim2);}
   table.costs-flat tr.group-start td{border-top:2px solid var(--gris4);}
+  table.costs-flat tr.row-transporte td{background:#fdf6ec;}
+  .tag-transporte{display:inline-block;font-family:var(--cond);font-size:10.5px;font-weight:800;letter-spacing:.02em;background:#f0a83a;color:#fff;border-radius:12px;padding:2px 9px;margin-bottom:3px;}
   table.costs-flat tfoot td{border-top:3px solid var(--naranja);border-bottom:none;font-family:var(--cond);font-weight:900;font-size:16.5px;padding:14px 12px;background:var(--gris2);}
   table.costs-flat input{background:transparent;border:none;border-bottom:1px dashed var(--gris4);color:var(--texto);font-family:var(--sans);font-size:14.5px;width:100%;padding:3px 0;}
   table.costs-flat input:focus{outline:none;border-bottom:1px solid var(--naranja);}
@@ -209,6 +211,7 @@
   table.ps-table td{padding:8px 10px;border-bottom:1px solid #e5e5e5;}
   table.ps-table td.num{text-align:right;}
   .ps-total-row td{border-top:2px solid var(--naranja);border-bottom:none;font-family:var(--cond);font-weight:800;font-size:14px;padding-top:12px;}
+  .ps-tag-transporte{display:inline-block;font-family:var(--cond);font-size:9px;font-weight:800;letter-spacing:.04em;background:#f0a83a;color:#fff;border-radius:10px;padding:2px 8px;margin-bottom:3px;}
   .ps-meta-box{background:#f4f4f2;border-radius:6px;padding:12px 16px;margin-bottom:18px;font-family:var(--cond);font-size:12px;color:#444;}
   .ps-foot{margin-top:30px;padding-top:12px;border-top:1px solid #ddd;font-family:var(--cond);font-size:10px;color:#999;}
 
@@ -781,10 +784,11 @@ function renderTrips(){
     if(visibleItems.length===0) return;
     visibleItems.forEach(({i, ii}, rowIdx)=>{
       const pagado = !!i.pagado;
-      const usd = toUSD(i.amount,i.cur);
+      const amountSafe = Number(i.amount) || 0;
+      const usd = toUSD(amountSafe,i.cur);
       const montoCell = EDIT_MODE
-        ? `<input type="number" value="${i.amount}" data-trip="${ti}" data-item="${ii}" onchange="updateAmount(this)">`
-        : `<span>${i.amount.toLocaleString('es-AR')}</span>`;
+        ? `<input type="number" value="${amountSafe}" data-trip="${ti}" data-item="${ii}" onchange="updateAmount(this)">`
+        : `<span>${amountSafe.toLocaleString('es-AR')}</span>`;
       const estadoCell = EDIT_MODE
         ? `<button class="estado-btn ${pagado?'estado-ok':'estado-pend'}" data-trip="${ti}" data-item="${ii}" onclick="togglePagado(this)">${pagado?'✔ Pagado':'Pendiente'}</button>`
         : `<span class="estado-badge ${pagado?'estado-ok':'estado-pend'}">${pagado?'✔ Pagado':'Pendiente'}</span>`;
@@ -889,18 +893,23 @@ function renderCertMensual(){
     const group = CERT_MENSUAL.filter(r=>Number(r.certId)===certId);
     const head = group[0];
     const pagado = head.estado === 'Cobrado';
+    const transporteTotal = group.filter(r=>r.esTransporte).reduce((s,r)=>s+r.total,0);
+    const netoIngemax = head.totalMes - transporteTotal;
     const estadoCell = EDIT_MODE
       ? `<button class="estado-btn ${pagado?'estado-ok':'estado-pend'}" onclick="toggleCertMensual(${certId}, this)">${pagado?'✔ Cobrado':'Pendiente'}</button>`
       : `<span class="estado-badge ${pagado?'estado-ok':'estado-pend'}">${pagado?'✔ Cobrado':'Pendiente'}</span>`;
     group.forEach((r, idx)=>{
+      const totalMesNote = transporteTotal>0
+        ? `<span class="c-fechas" style="color:var(--gris5);">Neto INGEMAX: ${fmtUSD(Math.round(netoIngemax))} · Terceros: ${fmtUSD(Math.round(transporteTotal))}</span>`
+        : '';
       const certCell = idx===0
         ? `<td class="c-viaje" rowspan="${group.length}">Cert. Nº${certId} — ${r.mes}<span class="c-fechas">Cobro: ${r.fechaCobro||'—'}</span><br><button class="print-btn" onclick="printCertificado(${certId})">🖨 Imprimir</button></td>`
         : '';
       const estadoTd = idx===0 ? `<td class="num" rowspan="${group.length}">${estadoCell}</td>` : '';
-      const totalMesTd = idx===0 ? `<td class="num" rowspan="${group.length}">${fmtUSD(Math.round(r.totalMes))}</td>` : '';
-      rowsHtml += `<tr class="${idx===0?'group-start':''}">
+      const totalMesTd = idx===0 ? `<td class="num" rowspan="${group.length}">${fmtUSD(Math.round(r.totalMes))}${totalMesNote}</td>` : '';
+      rowsHtml += `<tr class="${idx===0?'group-start':''}${r.esTransporte?' row-transporte':''}">
         ${certCell}
-        <td>${r.descripcion}${r.observaciones?`<span class="c-fechas" style="color:var(--gris5);">${r.observaciones}</span>`:''}</td>
+        <td>${r.esTransporte?'<span class="tag-transporte">🔁 Transporte de fondos — no es honorario INGEMAX</span><br>':''}${r.descripcion}${r.observaciones?`<span class="c-fechas" style="color:var(--gris5);">${r.observaciones}</span>`:''}</td>
         <td class="num">${r.cantidad}</td>
         <td class="num">${fmtUSD(Math.round(r.precio))}</td>
         <td class="num">${fmtUSD(Math.round(r.total))}</td>
@@ -977,7 +986,7 @@ function renderCertOsbl(){
         ${empresaCell}
         <td>${r.obra}<span class="c-fechas">Período: ${r.periodo}</span></td>
         <td class="num">${r.nCert}</td>
-        <td class="num">${r.moneda} ${r.montoOriginal.toLocaleString('es-AR')}</td>
+        <td class="num">${r.moneda} ${(Number(r.montoOriginal)||0).toLocaleString('es-AR')}</td>
         <td class="num">${fmtUSD(Math.round(r.montoUSD))}</td>
         <td class="num">${(r.pctHonorario*100).toFixed(1)}%</td>
         <td class="num">${fmtUSD(Math.round(r.honorarioUSD))}</td>
@@ -1038,13 +1047,18 @@ function buildCertPage_(certId){
   if(!group.length) return '';
   const head = group[0];
   const totalMes = head.totalMes;
+  const transporteTotal = group.filter(r=>r.esTransporte).reduce((s,r)=>s+r.total,0);
+  const netoIngemax = totalMes - transporteTotal;
   const logoSrc = document.querySelector('.logo-box img')?.getAttribute('src') || '';
   const rows = group.map(r=>`<tr>
-    <td>${r.descripcion}${r.observaciones?` — <i>${r.observaciones}</i>`:''}</td>
+    <td>${r.esTransporte?'<span class="ps-tag-transporte">TRANSPORTE DE FONDOS — NO ES HONORARIO INGEMAX</span><br>':''}${r.descripcion}${r.observaciones?` — <i>${r.observaciones}</i>`:''}</td>
     <td class="num">${r.cantidad}</td>
     <td class="num">${fmtUSD(Math.round(r.precio))}</td>
     <td class="num">${fmtUSD(Math.round(r.total))}</td>
   </tr>`).join('');
+  const desgloseRow = transporteTotal>0
+    ? `<tr><td colspan="3">Neto INGEMAX / Transporte de fondos a terceros</td><td class="num">${fmtUSD(Math.round(netoIngemax))} / ${fmtUSD(Math.round(transporteTotal))}</td></tr>`
+    : '';
   return `<div class="ps-page">
     <div class="ps-head">
       <img src="${logoSrc}" alt="INGEMAX S.A.">
@@ -1056,7 +1070,10 @@ function buildCertPage_(certId){
     <table class="ps-table">
       <thead><tr><th>Concepto</th><th>Cantidad</th><th>Precio</th><th>Total</th></tr></thead>
       <tbody>${rows}</tbody>
-      <tfoot><tr class="ps-total-row"><td colspan="3">TOTAL DEL CERTIFICADO</td><td class="num">${fmtUSD(Math.round(totalMes))}</td></tr></tfoot>
+      <tfoot>
+        ${desgloseRow}
+        <tr class="ps-total-row"><td colspan="3">TOTAL DEL CERTIFICADO</td><td class="num">${fmtUSD(Math.round(totalMes))}</td></tr>
+      </tfoot>
     </table>
     <div class="ps-foot">INGEMAX S.A. · Dirección Técnica de Obra · AlcoEnergy — Planta Industrial de Etanol</div>
   </div>`;
@@ -1092,7 +1109,7 @@ function buildCertOsblPage_(rowIndex){
     <table class="ps-table">
       <thead><tr><th>Concepto</th><th>Valor</th></tr></thead>
       <tbody>
-        <tr><td>Monto original certificado</td><td class="num">${r.moneda} ${r.montoOriginal.toLocaleString('es-AR')}</td></tr>
+        <tr><td>Monto original certificado</td><td class="num">${r.moneda} ${(Number(r.montoOriginal)||0).toLocaleString('es-AR')}</td></tr>
         <tr><td>Tipo de cambio</td><td class="num">${r.tc}</td></tr>
         <tr><td>Monto en USD</td><td class="num">${fmtUSD(Math.round(r.montoUSD))}</td></tr>
         <tr><td>Porcentaje de honorario</td><td class="num">${(r.pctHonorario*100).toFixed(1)}%</td></tr>
