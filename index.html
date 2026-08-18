@@ -984,7 +984,7 @@ function renderCertOsbl(){
         <td class="num">
           <div style="display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;">
             <button class="print-btn" onclick="printCertOsbl(${idx})">🖨 Imprimir</button>
-            <a class="print-btn" href="${certOsblFileName(r)}" target="_blank" rel="noopener">⬇ Original</a>
+            ${r.archivo ? `<a class="print-btn" href="${certOsblFileName(r)}" target="_blank" rel="noopener">⬇ Original</a>` : `<span class="print-btn" style="opacity:.45;cursor:default;border-style:dashed;">Sin original</span>`}
           </div>
         </td>
       </tr>`;
