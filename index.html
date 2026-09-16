@@ -708,6 +708,7 @@ function renderGantt(){
     cur = nextMonth;
   }
 
+  const missingTrips = [];
   let html = `<div class="gantt-ruler"><div class="rl">Equipo</div><div style="position:relative;flex:1;width:${trackWidth}px;display:flex;">`;
   months.forEach(m=>{ html += `<div class="month" style="width:${m.width}px;">${m.label}</div>`; });
   html += `</div></div>`;
@@ -720,6 +721,10 @@ function renderGantt(){
     html += `<div class="gantt-track" style="width:${trackWidth}px;">`;
     stays.forEach(s=>{
       const trip = tripById(s.tripId);
+      if(!trip){
+        missingTrips.push(`${p.name}: tripId "${s.tripId}" (${s.from} → ${s.to})`);
+        return;
+      }
       const label = trip.name + (s.suffix ? ' '+s.suffix : '');
       const offset = dayDiff(minDate.toISOString().slice(0,10), s.from) * pxPerDay;
       const width = Math.max(dayDiff(s.from,s.to) * pxPerDay, 96);
@@ -727,6 +732,12 @@ function renderGantt(){
     });
     html += `</div></div>`;
   });
+
+  if(missingTrips.length){
+    html = `<div style="padding:10px 14px;margin-bottom:10px;background:#fff3e0;border:1px solid #e2a545;border-radius:6px;font-family:var(--cond);color:#7a4a00;font-size:13px;">
+      ⚠ ${missingTrips.length} estadía(s) sin viaje asociado — falta agregar el tripId correspondiente en la hoja "Viajes":<br>${missingTrips.join('<br>')}
+    </div>` + html;
+  }
 
   wrap.innerHTML = html;
 }
