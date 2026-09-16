@@ -913,8 +913,11 @@ function renderCertMensual(){
       const totalMesNote = transporteTotal>0
         ? `<span class="c-fechas" style="color:var(--gris5);">Neto INGEMAX: ${fmtUSD(Math.round(netoIngemax))} · Terceros: ${fmtUSD(Math.round(transporteTotal))}</span>`
         : '';
+      const accionBtn = certId===6
+        ? `<a class="print-btn" href="INGEMAX_Certificado6_DetalleOSBL.pdf" target="_blank" rel="noopener" download>⬇ Descargar (detalle OSBL)</a>`
+        : `<button class="print-btn" onclick="printCertificado(${certId})">🖨 Imprimir</button>`;
       const certCell = idx===0
-        ? `<td class="c-viaje" rowspan="${group.length}">Cert. Nº${certId} — ${r.mes}<span class="c-fechas">Cobro: ${r.fechaCobro||'—'}</span><br><button class="print-btn" onclick="printCertificado(${certId})">🖨 Imprimir</button></td>`
+        ? `<td class="c-viaje" rowspan="${group.length}">Cert. Nº${certId} — ${r.mes}<span class="c-fechas">Cobro: ${r.fechaCobro||'—'}</span><br>${accionBtn}</td>`
         : '';
       const estadoTd = idx===0 ? `<td class="num" rowspan="${group.length}">${estadoCell}</td>` : '';
       const totalMesTd = idx===0 ? `<td class="num" rowspan="${group.length}">${fmtUSD(Math.round(r.totalMes))}${totalMesNote}</td>` : '';
