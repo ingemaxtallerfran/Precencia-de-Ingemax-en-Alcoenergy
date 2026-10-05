@@ -947,6 +947,12 @@ async function toggleCertMensual(certId, btn){
   }
 }
 
+// Certificados con un PDF armado a mano que incluye el detalle del Ítem D (en vez del botón Imprimir)
+const CERT_DETALLE_PDF = {
+  6: 'INGEMAX_Certificado6_DetalleOSBL.pdf',
+  7: 'INGEMAX_Certificado7_DetalleOSBL.pdf',
+};
+
 function renderCertMensual(){
   const el = document.getElementById('certMensualWrap');
   if(!CERT_MENSUAL.length){ el.innerHTML = '<div class="c-empty">Sin certificados cargados.</div>'; return; }
@@ -967,8 +973,9 @@ function renderCertMensual(){
       const totalMesNote = transporteTotal>0
         ? `<span class="c-fechas" style="color:var(--gris5);">Neto INGEMAX: ${fmtUSD(Math.round(netoIngemax))} · Terceros: ${fmtUSD(Math.round(transporteTotal))}</span>`
         : '';
-      const accionBtn = certId===6
-        ? `<a class="print-btn" href="INGEMAX_Certificado6_DetalleOSBL.pdf" target="_blank" rel="noopener" download>⬇ Descargar (detalle OSBL)</a>`
+      const detallePdf = CERT_DETALLE_PDF[certId];
+      const accionBtn = detallePdf
+        ? `<a class="print-btn" href="${detallePdf}" target="_blank" rel="noopener" download>⬇ Descargar (detalle OSBL)</a>`
         : `<button class="print-btn" onclick="printCertificado(${certId})">🖨 Imprimir</button>`;
       const certCell = idx===0
         ? `<td class="c-viaje" rowspan="${group.length}">Cert. Nº${certId} — ${r.mes}<span class="c-fechas">Cobro: ${r.fechaCobro||'—'}</span><br>${accionBtn}</td>`
