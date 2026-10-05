@@ -382,6 +382,8 @@
     <button class="tabnav-btn" data-mod="presencia" onclick="showModule('presencia')">Presencia</button>
   </nav>
 
+  <div id="loadStatus" style="display:none;"></div>
+
   <div id="globalErrorBanner" style="display:none;background:#fdecea;border:2px solid var(--rojo);color:var(--rojo);border-radius:var(--rsm);padding:12px 16px;margin-bottom:18px;font-family:var(--cond);font-size:13px;line-height:1.6;"></div>
 
   <!-- ═══════════ MÓDULO 2 — CONTRATO ═══════════ -->
@@ -567,38 +569,90 @@ function showModule(name){
 
 // ---------- JSONP helper (mismo patrón que tus otras apps) ----------
 let _jsonpCounter = 0;
-function jsonp(params){
+function jsonp(params, timeoutMs){
   return new Promise((resolve, reject)=>{
     const cbName = '_cb' + (_jsonpCounter++);
     params.callback = cbName;
     const qs = Object.entries(params).map(([k,v])=> encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
     const script = document.createElement('script');
-    window[cbName] = (data)=>{
-      resolve(data);
-      delete window[cbName];
-      script.remove();
-    };
-    script.onerror = ()=>{ reject(new Error('Error de red contra el backend')); delete window[cbName]; script.remove(); };
+    let timer = null;
+    const cleanup = ()=>{ clearTimeout(timer); delete window[cbName]; script.remove(); };
+    window[cbName] = (data)=>{ cleanup(); resolve(data); };
+    script.onerror = ()=>{ cleanup(); reject(new Error('Error de red contra el backend')); };
+    if(timeoutMs){
+      timer = setTimeout(()=>{ cleanup(); window[cbName] = ()=>{}; reject(new Error('El backend tardó demasiado en responder')); }, timeoutMs);
+    }
     script.src = GAS_URL + '?' + qs;
     document.body.appendChild(script);
   });
 }
 
+// El Apps Script de Google a veces responde lento o con error 404 intermitente.
+// Por eso: se muestran enseguida los últimos datos guardados y se reintenta en segundo plano.
+const CACHE_KEY = 'ingemax_cache_v1';
+
+function applyData_(data){
+  PEOPLE = data.people;
+  TRIPS = data.trips;
+  STAYS = data.stays;
+  CONTRATO = data.contrato || [];
+  CERT_MENSUAL = data.certMensual || [];
+  CERT_OSBL = data.certOsbl || [];
+  renderAll();
+}
+
+function setLoadStatus_(html, kind){
+  const el = document.getElementById('loadStatus');
+  if(!el) return;
+  if(!html){ el.style.display = 'none'; el.innerHTML = ''; return; }
+  const colors = kind==='error' ? 'background:#fdecea;border-color:var(--rojo);color:var(--rojo);' : 'background:#fff8e6;border-color:#e2a545;color:#7a4a00;';
+  el.style.cssText = 'display:block;border:1px solid;border-radius:var(--rsm);padding:9px 14px;margin-bottom:14px;font-family:var(--cond);font-size:13px;' + colors;
+  el.innerHTML = html;
+}
+
+async function fetchAllWithRetry_(maxAttempts){
+  let lastErr;
+  for(let i=1; i<=maxAttempts; i++){
+    try{
+      const data = await jsonp({ action:'getAll' }, 45000);
+      if(!data.ok) throw new Error(data.error || 'Error desconocido');
+      return data;
+    }catch(err){
+      lastErr = err;
+      if(i < maxAttempts){
+        setLoadStatus_(`⏳ La planilla está tardando en responder (intento ${i} de ${maxAttempts})… reintentando.`);
+        await new Promise(r=>setTimeout(r, 1500));
+      }
+    }
+  }
+  throw lastErr;
+}
+
 async function loadData(){
   const wrap = document.getElementById('gantt');
-  wrap.innerHTML = '<div style="padding:20px;font-family:var(--cond);color:var(--gris5);">Cargando datos desde la planilla…</div>';
+  let cached = null;
+  try{ cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); }catch(e){}
+
+  if(cached && cached.data){
+    applyData_(cached.data);
+    const hora = new Date(cached.savedAt).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    setLoadStatus_(`⏳ Actualizando desde la planilla… (mostrando datos guardados del ${hora})`);
+  } else {
+    wrap.innerHTML = '<div style="padding:20px;font-family:var(--cond);color:var(--gris5);">Cargando datos desde la planilla… (puede tardar unos segundos)</div>';
+  }
+
   try{
-    const data = await jsonp({ action:'getAll' });
-    if(!data.ok) throw new Error(data.error || 'Error desconocido');
-    PEOPLE = data.people;
-    TRIPS = data.trips;
-    STAYS = data.stays;
-    CONTRATO = data.contrato || [];
-    CERT_MENSUAL = data.certMensual || [];
-    CERT_OSBL = data.certOsbl || [];
-    renderAll();
+    const data = await fetchAllWithRetry_(4);
+    try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ savedAt: Date.now(), data })); }catch(e){}
+    applyData_(data);
+    setLoadStatus_('');
   }catch(err){
-    wrap.innerHTML = '<div style="padding:20px;font-family:var(--cond);color:var(--rojo);">No se pudo conectar con la planilla. Revisá que GAS_URL esté bien pegada y que el deploy sea "Cualquiera" con acceso. Detalle: '+err.message+'</div>';
+    if(cached && cached.data){
+      const hora = new Date(cached.savedAt).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+      setLoadStatus_(`⚠ No se pudo actualizar desde la planilla (${err.message}). Estás viendo los datos guardados del ${hora}. <button class="print-btn" onclick="loadData()">Reintentar</button>`, 'error');
+    } else {
+      wrap.innerHTML = '<div style="padding:20px;font-family:var(--cond);color:var(--rojo);">No se pudo conectar con la planilla (' + err.message + '). Suele ser un problema pasajero de Google. <button class="print-btn" onclick="loadData()">Reintentar</button></div>';
+    }
   }
 }
 
